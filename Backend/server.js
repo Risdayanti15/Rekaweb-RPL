@@ -5,9 +5,14 @@ const app = express();
 
 // 👑 1. PENGATURAN CORS (Wajib di Atas Sebelum Rute API)
 app.use(cors({
-    origin: "*", // Mengizinkan frontend lokal Anda              // Wajib true jika frontend Anda mengirim token/cookie (withCredentials)
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"]
+    origin: [
+        'http://localhost:5173', 
+        'http://127.0.0.1:5173', 
+        'https://rekaweb-rpl.vercel.app' // 💡 WAJIB TAMBAHKAN INI (Tanpa tanda garis miring '/' di ujungnya)
+    ], 
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
 // 📦 2. Middleware Parser JSON
