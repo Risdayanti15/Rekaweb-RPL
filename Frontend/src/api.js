@@ -1,11 +1,11 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "rekaweb-rpl-production.up.railway.app/api",
-  headers: {
-    "Content-Type": "application/json",
-  },
+  baseURL: "https://rekaweb-rpl-production.up.railway.app/api",
+  withCredentials: true
 });
+
+export default api;
 
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem("token");
