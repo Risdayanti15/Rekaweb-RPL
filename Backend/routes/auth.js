@@ -118,7 +118,7 @@ router.post('/login',
       const token = jwt.sign(
         { id: user.id, email: user.email },
         process.env.JWT_SECRET,
-        { expiresIn: process.env.JWT_EXPIRES }
+        { expiresIn: process.env.JWT_EXPIRES || '1d' }
       );
 
       const { password: _, ...userData } = user.toJSON();
