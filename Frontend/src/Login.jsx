@@ -19,7 +19,7 @@ function Login() {
     }
     try {
       // 🚀 SOLUSI 1: Tulis langsung "auth/login" (TANPA garis miring di awal) agar pas melekat di belakang /api
-      const response = await api.post("auth/login", { email, password });
+      const response = await api.post("https://rekaweb-rpl-production.up.railway.app/api/auth/login", { email, password });
       
       // 🚀 ATAU SOLUSI 2 (Paling Aman di Vercel): Tulis URL lengkapnya langsung di sini jika solusi 1 masih rewel
       // const response = await api.post("https://rekaweb-rpl-production.up.railway.app/api/auth/login", { email, password });
