@@ -5,7 +5,8 @@ const dbConfig = {
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
   host: process.env.DB_HOST,
-  port: process.env.DB_PORT || 3306, // Akan otomatis membaca 27296 jika ada di Railway Variables
+  // ⚡ WAJIB: Gunakan parseInt agar port '27296' dibaca sebagai angka murni, bukan teks string
+  port: parseInt(process.env.DB_PORT, 10) || 3306, 
   dialect: 'mysql',
   dialectOptions: process.env.PORT ? {
     ssl: {
