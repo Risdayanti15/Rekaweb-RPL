@@ -34,7 +34,7 @@ router.post('/register',
     .isLength({ min: 2, max: 100 }).withMessage('Nama minimal 2 karakter!'),
   body('email')
     .trim()
-    .normalizeEmail()
+    // ✂️ HAPUS BARIS .normalizeEmail() DI SINI
     .notEmpty().withMessage('Email wajib diisi!')
     .isEmail().withMessage('Format email tidak valid!'),
   body('password')
@@ -87,7 +87,7 @@ router.post('/register',
 router.post('/login',
   body('email')
     .trim()
-    .normalizeEmail()
+    // ✂️ HAPUS BARIS .normalizeEmail() DI SINI
     .notEmpty().withMessage('Email wajib diisi!')
     .isEmail().withMessage('Format email tidak valid!'),
   body('password')
