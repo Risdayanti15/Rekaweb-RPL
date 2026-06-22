@@ -5,8 +5,7 @@ const app = express();
 
 // 👑 1. PENGATURAN CORS (Wajib di Atas Sebelum Rute API)
 app.use(cors({
-    origin: "http://localhost:5173", // Mengizinkan frontend lokal Anda
-    credentials: true,               // Wajib true jika frontend Anda mengirim token/cookie (withCredentials)
+    origin: "*", // Mengizinkan frontend lokal Anda              // Wajib true jika frontend Anda mengirim token/cookie (withCredentials)
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"]
 }));
