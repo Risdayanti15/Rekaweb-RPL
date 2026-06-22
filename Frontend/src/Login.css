@@ -1,0 +1,280 @@
+/* ================================
+   THEME VARIABLES
+================================ */
+:root {
+  --bg-left: #f5f5f5;
+  --bg-right: #a9c3d6;
+  --text-color: #222;
+  --subtext-color: #555;
+  --input-bg: #ffffff;
+  --input-text: #222;
+  --input-placeholder: #999;
+  --success-box-bg: #ffffff;
+  --success-title-color: #222;
+  --success-msg-color: #888;
+  --cancel-bg: #e8e8e8;
+  --cancel-color: #555;
+  --logo-text-color: #333;
+}
+
+[data-theme="dark"] {
+  --bg-left: #1a1a2e;
+  --bg-right: #16213e;
+  --text-color: #f0f0f0;
+  --subtext-color: #aaaaaa;
+  --input-bg: #2a2a3d;
+  --input-text: #f0f0f0;
+  --input-placeholder: #777;
+  --success-box-bg: #1e1e2e;
+  --success-title-color: #f0f0f0;
+  --success-msg-color: #aaaaaa;
+  --cancel-bg: #2a2a3d;
+  --cancel-color: #aaaaaa;
+  --logo-text-color: #dddddd;
+}
+
+body {
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+}
+
+.login-container {
+  display: flex;
+  height: 100vh;
+}
+
+/* LEFT */
+.left {
+  width: 50%;
+  background-color: var(--bg-left);
+  padding: 30px;
+  position: relative;
+  transition: background-color 0.3s;
+}
+
+.logo-area {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logo-area img {
+  width: 45px;
+}
+
+.logo-area p {
+  margin: 0;
+  font-size: 12px;
+  color: var(--logo-text-color);
+  transition: color 0.3s;
+}
+
+.logo-area strong {
+  font-size: 14px;
+  color: #2f80ed;
+}
+
+.illustration {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 80%;
+}
+
+.illustration img {
+  width: 350px;
+}
+
+/* RIGHT */
+.right {
+  width: 50%;
+  background-color: var(--bg-right);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px;
+  box-sizing: border-box;
+  transition: background-color 0.3s;
+}
+
+/* FORM */
+.form-box {
+  width: 100%;
+  max-width: 400px;
+}
+
+.form-box h2 {
+  margin: 0;
+  color: var(--text-color);
+  transition: color 0.3s;
+}
+
+.form-box > p {
+  font-size: 14px;
+  margin-bottom: 20px;
+  color: var(--subtext-color);
+  transition: color 0.3s;
+}
+
+/* INPUT */
+.form-box input[type="email"],
+.form-box input[type="password"] {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 15px;
+  border: none;
+  border-radius: 4px;
+  box-sizing: border-box;
+  background-color: var(--input-bg);
+  color: var(--input-text);
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.form-box input[type="email"]::placeholder,
+.form-box input[type="password"]::placeholder {
+  color: var(--input-placeholder);
+}
+
+/* EXTRA */
+.extra {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  margin-bottom: 15px;
+  color: var(--subtext-color);
+}
+
+.forgot {
+  color: #2f80ed;
+  cursor: pointer;
+}
+
+/* BUTTON */
+.form-box > button {
+  width: 100%;
+  padding: 12px;
+  background-color: #2f80ed;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  transition: 0.2s;
+}
+
+.form-box > button:hover {
+  background-color: #1a6fd4;
+}
+
+/* REGISTER TEXT */
+.register-text {
+  text-align: center;
+  font-size: 13px;
+  margin-top: 10px;
+  color: var(--subtext-color);
+}
+
+.register-text span {
+  color: #2f80ed;
+  cursor: pointer;
+}
+
+/* GOOGLE */
+.google {
+  margin-top: 15px;
+  text-align: center;
+}
+
+.google img {
+  width: 25px;
+  cursor: pointer;
+}
+
+/* ================================
+   POPUP SUCCESS
+================================ */
+.success-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.success-box {
+  background: var(--success-box-bg);
+  border-radius: 20px;
+  padding: 40px 36px 32px;
+  text-align: center;
+  width: 320px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+  transition: background-color 0.3s;
+}
+
+.success-icon {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 20px;
+}
+
+.success-icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+.success-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--success-title-color);
+  margin: 0 0 8px 0;
+}
+
+.success-msg {
+  font-size: 14px;
+  color: var(--success-msg-color);
+  margin: 0 0 28px 0;
+}
+
+.success-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.btn-cancel {
+  flex: 1;
+  padding: 12px;
+  border-radius: 10px;
+  border: none;
+  background: var(--cancel-bg);
+  color: var(--cancel-color);
+  font-size: 14px;
+  font-weight: 600;
+  font-family: 'Poppins', sans-serif;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.btn-cancel:hover {
+  background: #d5d5d5;
+}
+
+.btn-dashboard {
+  flex: 1;
+  padding: 12px;
+  border-radius: 10px;
+  border: none;
+  background: #2f80ed;
+  color: white;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: 'Poppins', sans-serif;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.btn-dashboard:hover {
+  background: #051b47;
+}

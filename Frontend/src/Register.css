@@ -1,0 +1,106 @@
+body {
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+}
+
+/* Container utama */
+.register-container {
+  display: flex;
+  height: 100vh;
+}
+
+/* LEFT */
+.left {
+  width: 50%;
+  background-color: #f5f5f5;
+  position: relative;
+  padding: 30px;
+}
+
+/* Logo */
+.logo-area {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logo-area img {
+  width: 45px;
+}
+
+.logo-area p {
+  margin: 0;
+  font-size: 12px;
+}
+
+.logo-area strong {
+  font-size: 14px;
+  color: #2f80ed;
+}
+
+/* Ilustrasi */
+.illustration {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 80%;
+}
+
+.illustration img {
+  width: 350px;
+}
+
+/* RIGHT */
+.right {
+  width: 50%;
+  background-color: #a9c3d6;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Form */
+.form-box {
+  width: 300px;
+}
+
+.form-box h2 {
+  margin: 0;
+}
+
+.form-box p {
+  margin-bottom: 20px;
+  font-size: 14px;
+}
+
+/* Input */
+.form-box input {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 15px;
+  border: none;
+  border-radius: 4px;
+}
+
+/* Button */
+.form-box button {
+  width: 100%;
+  padding: 12px;
+  background-color: #2f80ed;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+/* Login text */
+.login-text {
+  text-align: center;
+  margin-top: 10px;
+  font-size: 13px;
+}
+
+.login-text span {
+  color: #2f80ed;
+  cursor: pointer;
+}
