@@ -13,10 +13,10 @@ app.use(cors({
 // 📦 2. Middleware Parser JSON
 app.use(express.json());
 
-// 🗄️ 3. SINKRONISASI DATABASE (Menggunakan Sequelize ORM dari folder models)
+// 🗄️ SINKRONISASI DATABASE (Paksa buat tabel jika belum ada)
 const db = require('./models');
-db.sequelize.sync()
-  .then(() => console.log('⚡ Database Berhasil Sinkron via Sequelize ORM!'))
+db.sequelize.sync({ alter: true }) // ⚡ Tambahkan { alter: true } di sini
+  .then(() => console.log('⚡ Database Berhasil Sinkron & Tabel Terbuat via Sequelize!'))
   .catch(err => console.error('❌ Gagal sinkronisasi database:', err.message));
 
 // 🛣️ 4. DEKLARASI RUTE API
