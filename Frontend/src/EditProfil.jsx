@@ -17,6 +17,12 @@ function EditProfil() {
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [toast, setToast] = useState({ show: false, message: "", type: "" });
+
+  const showToast = (message, type = "success") => {
+    setToast({ show: true, message, type });
+    setTimeout(() => setToast({ show: false, message: "", type: "" }), 3000);
+  };
 
   // Load data user saat halaman dibuka
   useEffect(() => {
@@ -83,13 +89,13 @@ function EditProfil() {
       const data = await response.json();
 
       if (response.ok) {
-        alert("Profil berhasil disimpan!");
-        navigate("/profil");
+        showToast("Profil berhasil disimpan!", "success");
+        setTimeout(() => navigate("/profil"), 1500);
       } else {
-        alert(data.message || "Gagal menyimpan profil!");
+        showToast(data.message || "Gagal menyimpan profil!", "error");
       }
     } catch (error) {
-      alert("Tidak dapat terhubung ke server!");
+      showToast("Tidak dapat terhubung ke server!", "error");
     } finally {
       setSaving(false);
     }
@@ -159,7 +165,42 @@ function EditProfil() {
 
         /* LOADING */
         .edit-loading { display: flex; align-items: center; justify-content: center; height: 200px; font-size: 16px; color: #888; }
+
+        /* TOAST */
+        .toast {
+          position: fixed;
+          top: 30px;
+          left: 50%;
+          transform: translateX(-50%);
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          padding: 14px 28px;
+          border-radius: 16px;
+          font-size: 14px;
+          font-weight: 600;
+          color: white;
+          box-shadow: 0 8px 30px rgba(0,0,0,0.18);
+          z-index: 9999;
+          animation: toastSlideDown 0.35s cubic-bezier(0.34,1.56,0.64,1);
+          white-space: nowrap;
+        }
+        .toast.success { background: linear-gradient(135deg, #22c55e, #16a34a); }
+        .toast.error   { background: linear-gradient(135deg, #ef4444, #dc2626); }
+        .toast-icon { font-size: 22px; }
+        @keyframes toastSlideDown {
+          from { top: -80px; opacity: 0; }
+          to   { top: 30px;  opacity: 1; }
+        }
       `}</style>
+
+      {/* TOAST NOTIFICATION */}
+      {toast.show && (
+        <div className={`toast ${toast.type}`}>
+          <span className="toast-icon">{toast.type === "success" ? "✅" : "❌"}</span>
+          {toast.message}
+        </div>
+      )}
 
       <div className="edit-page">
 
