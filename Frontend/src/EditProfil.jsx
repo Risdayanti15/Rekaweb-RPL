@@ -64,7 +64,7 @@ function EditProfil() {
 
     setSaving(true);
     try {
-      const response = await fetch("http://localhost:3001/api/auth/me", {
+      const response = await fetch("https://rekaweb-rpl-production.up.railway.app/api/auth/me", {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
