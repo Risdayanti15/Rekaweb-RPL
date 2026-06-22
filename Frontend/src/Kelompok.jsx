@@ -64,7 +64,7 @@ function Kelompok() {
 
     if (type === "hapus") {
       try {
-        const res = await fetch(`http://localhost:3001/api/groups/${targetId}`, { method: "DELETE" });
+        const res = await fetch(`https://rekaweb-rpl-production.up.railway.app/api/groups/${targetId}`, { method: "DELETE" });
         if (res.ok) {
           showPopup("Kelompok berhasil dihapus! ✓");
           fetchGroups();
@@ -89,7 +89,7 @@ function Kelompok() {
     try {
       const user = JSON.parse(localStorage.getItem("user"));
       const s = statusMap[form.status];
-      const res = await fetch("http://localhost:3001/api/groups", {
+      const res = await fetch("https://rekaweb-rpl-production.up.railway.app/api/groups", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -129,7 +129,7 @@ function Kelompok() {
     }
     try {
       const s = statusMap[editForm.status];
-      const res = await fetch(`http://localhost:3001/api/groups/${editTarget.id}`, {
+      const res = await fetch(`https://rekaweb-rpl-production.up.railway.app/api/groups/${editTarget.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
