@@ -3,6 +3,9 @@ const cors = require('cors');
 require('dotenv').config();
 const app = express();
 
+// ✅ TAMBAHKAN BARIS INI: Agar server otomatis memicu koneksi database saat menyala
+require('./config/config'); 
+
 app.use(cors());
 app.use(express.json());
 
