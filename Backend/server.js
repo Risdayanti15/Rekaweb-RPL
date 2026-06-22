@@ -6,7 +6,12 @@ const app = express();
 // ✅ TAMBAHKAN BARIS INI: Agar server otomatis memicu koneksi database saat menyala
 require('./config/config'); 
 
-app.use(cors());
+app.use(cors({
+    origin: "http://localhost:5173", // Mengizinkan alamat frontend lokalmu
+    credentials: true,               // Wajib true karena di frontend api.js kita pakai withCredentials: true
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"]
+}));
 app.use(express.json());
 
 const authRoutes = require('./routes/auth');
