@@ -1,39 +1,22 @@
-const mysql = require('mysql2');
 require('dotenv').config();
 
-let db_config;
-
-// 🚀 Deteksi Otomatis: Jika ada variabel PORT, berarti berjalan di Railway (Production)
-if (process.env.PORT) {
-    db_config = {
-        host: process.env.DB_HOST,
-        user: process.env.DB_USER,
-        password: process.env.DB_PASSWORD,
-        database: process.env.DB_NAME,
-        port: process.env.DB_PORT || 27296,
-        // 🔥 Tambahkan SSL agar jabat tangan jaringan dengan database cloud aman
-        ssl: {
-            rejectUnauthorized: false
-        }
-    };
-} else {
-    // 💻 Jika tidak ada PORT, berarti berjalan di Laptop ThinkPad (Localhost)
-    db_config = {
-        host: 'localhost',
-        user: 'root',
-        password: '', // isi jika phpMyAdmin lokalmu menggunakan password
-        database: 'db_rekaweb_rpl' // 💡 Sesuaikan dengan nama database lokalmu di phpMyAdmin
-    };
-}
-
-const db = mysql.createConnection(db_config);
-
-db.connect((err) => {
-    if (err) {
-        console.error('❌ Gagal menyambung ke database:', err.message);
-    } else {
-        console.log('⚡ Database Berhasil Terhubung ke Server Rekaweb-RPL!');
+const dbConfig = {
+  // 🔗 Masing-masing baris ini akan otomatis mengambil data Aiven yang ada di Railway Variables
+  username: process.env.DB_USER,      // Akan membaca 'avnadmin'
+  password: process.env.DB_PASSWORD,  // Akan membaca 'AVNS_fVgef...'
+  database: process.env.DB_NAME,      // Akan membaca 'defaultdb'
+  host: process.env.DB_HOST,          // Akan membaca 'mysql-1a31a69d...'
+  port: process.env.DB_PORT || 3306,  // Akan membaca '27296'
+  dialect: 'mysql',
+  dialectOptions: process.env.PORT ? {
+    ssl: {
+      rejectUnauthorized: false // Wajib aktif untuk jabat tangan aman dengan cloud Aiven
     }
-});
+  } : {}
+};
 
-module.exports = db;
+module.exports = {
+  development: dbConfig,
+  test: dbConfig,
+  production: dbConfig
+};
