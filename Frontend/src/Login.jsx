@@ -125,10 +125,7 @@ function Login() {
             Belum punya akun?{" "}
             <span onClick={() => navigate("/register")}>Daftar</span>
           </p>
-          <div className="google">
-            <img
-              src="https://www.svgrepo.com/show/475656/google-color.svg"
-              alt="google"
+       
             />
           </div>
         </div>
