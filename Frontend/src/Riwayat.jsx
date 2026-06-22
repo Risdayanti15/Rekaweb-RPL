@@ -66,7 +66,7 @@ function Riwayat() {
 
     if (type === "tugas") {
       try {
-        const res = await fetch(`http://localhost:3001/api/tasks/${targetId}`, { method: "DELETE" });
+        const res = await fetch(`https://rekaweb-rpl-production.up.railway.app/api/tasks/${targetId}`, { method: "DELETE" });
         if (res.ok) {
           setTugas(prev => prev.filter(t => t.id !== targetId));
           showPopup("Tugas berhasil dihapus! ✓");
@@ -81,7 +81,7 @@ function Riwayat() {
 
     if (type === "kelompok") {
       try {
-        const res = await fetch(`http://localhost:3001/api/groups/${targetId}`, { method: "DELETE" });
+        const res = await fetch(`https://rekaweb-rpl-production.up.railway.app/api/groups/${targetId}`, { method: "DELETE" });
         if (res.ok) {
           setKelompok(prev => prev.filter(k => k.id !== targetId));
           showPopup("Kelompok berhasil dihapus! ✓");
