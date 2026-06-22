@@ -17,14 +17,21 @@ function EditProfil() {
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [toast, setToast] = useState({ show: false, message: "", type: "" });
+  const [modal, setModal] = useState({ show: false, message: "", title: "", type: "" });
 
-  const showToast = (message, type = "success") => {
-    setToast({ show: true, message, type });
-    setTimeout(() => setToast({ show: false, message: "", type: "" }), 3000);
+  const showModal = (title, message, type = "success") => {
+    setModal({ show: true, title, message, type });
   };
 
-  // Load data user saat halaman dibuka
+  const handleModalOk = () => {
+    if (modal.type === "success") {
+      setModal({ show: false, message: "", title: "", type: "" });
+      navigate("/profil");
+    } else {
+      setModal({ show: false, message: "", title: "", type: "" });
+    }
+  };
+
   useEffect(() => {
     const fetchUser = async () => {
       const token = localStorage.getItem("token");
@@ -89,13 +96,12 @@ function EditProfil() {
       const data = await response.json();
 
       if (response.ok) {
-        showToast("Profil berhasil disimpan!", "success");
-        setTimeout(() => navigate("/profil"), 1500);
+        showModal("Berhasil!", "Profil berhasil disimpan.", "success");
       } else {
-        showToast(data.message || "Gagal menyimpan profil!", "error");
+        showModal("Gagal!", data.message || "Gagal menyimpan profil.", "error");
       }
     } catch (error) {
-      showToast("Tidak dapat terhubung ke server!", "error");
+      showModal("Error!", "Tidak dapat terhubung ke server.", "error");
     } finally {
       setSaving(false);
     }
@@ -166,39 +172,112 @@ function EditProfil() {
         /* LOADING */
         .edit-loading { display: flex; align-items: center; justify-content: center; height: 200px; font-size: 16px; color: #888; }
 
-        /* TOAST */
-        .toast {
+        /* MODAL OVERLAY */
+        .modal-overlay {
           position: fixed;
-          top: 30px;
-          left: 50%;
-          transform: translateX(-50%);
+          inset: 0;
+          background: rgba(0, 0, 0, 0.45);
           display: flex;
           align-items: center;
-          gap: 12px;
-          padding: 14px 28px;
-          border-radius: 16px;
-          font-size: 14px;
-          font-weight: 600;
-          color: white;
-          box-shadow: 0 8px 30px rgba(0,0,0,0.18);
+          justify-content: center;
           z-index: 9999;
-          animation: toastSlideDown 0.35s cubic-bezier(0.34,1.56,0.64,1);
-          white-space: nowrap;
+          animation: fadeIn 0.2s ease;
         }
-        .toast.success { background: linear-gradient(135deg, #22c55e, #16a34a); }
-        .toast.error   { background: linear-gradient(135deg, #ef4444, #dc2626); }
-        .toast-icon { font-size: 22px; }
-        @keyframes toastSlideDown {
-          from { top: -80px; opacity: 0; }
-          to   { top: 30px;  opacity: 1; }
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to   { opacity: 1; }
         }
+
+        /* MODAL BOX */
+        .modal-box {
+          background: #fff;
+          border-radius: 20px;
+          padding: 40px 36px 32px;
+          width: 340px;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 10px;
+          box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+          animation: popIn 0.3s cubic-bezier(0.34,1.56,0.64,1);
+        }
+        @keyframes popIn {
+          from { transform: scale(0.7); opacity: 0; }
+          to   { transform: scale(1);   opacity: 1; }
+        }
+
+        /* MODAL ICON */
+        .modal-icon-wrap {
+          width: 80px;
+          height: 80px;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin-bottom: 6px;
+        }
+        .modal-icon-wrap.success { background: #e8f8ee; }
+        .modal-icon-wrap.error   { background: #ffeaea; }
+
+        .modal-icon-inner {
+          width: 58px;
+          height: 58px;
+          border-radius: 12px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 34px;
+        }
+        .modal-icon-inner.success { background: #22c55e; }
+        .modal-icon-inner.error   { background: #ef4444; }
+
+        .modal-title {
+          font-size: 20px;
+          font-weight: 700;
+          color: #111;
+          margin-top: 4px;
+        }
+
+        .modal-message {
+          font-size: 14px;
+          color: #666;
+          text-align: center;
+          margin-bottom: 6px;
+        }
+
+        .modal-ok-btn {
+          width: 100%;
+          padding: 13px;
+          border: none;
+          border-radius: 12px;
+          font-size: 15px;
+          font-weight: 600;
+          cursor: pointer;
+          font-family: "Poppins", sans-serif;
+          margin-top: 8px;
+          transition: 0.2s;
+        }
+        .modal-ok-btn.success { background: #2d7dd2; color: white; }
+        .modal-ok-btn.success:hover { background: #1a5fa8; }
+        .modal-ok-btn.error   { background: #ef4444; color: white; }
+        .modal-ok-btn.error:hover   { background: #dc2626; }
       `}</style>
 
-      {/* TOAST NOTIFICATION */}
-      {toast.show && (
-        <div className={`toast ${toast.type}`}>
-          <span className="toast-icon">{toast.type === "success" ? "✅" : "❌"}</span>
-          {toast.message}
+      {/* MODAL POPUP */}
+      {modal.show && (
+        <div className="modal-overlay">
+          <div className="modal-box">
+            <div className={`modal-icon-wrap ${modal.type}`}>
+              <div className={`modal-icon-inner ${modal.type}`}>
+                {modal.type === "success" ? "✔️" : "✖️"}
+              </div>
+            </div>
+            <div className="modal-title">{modal.title}</div>
+            <div className="modal-message">{modal.message}</div>
+            <button className={`modal-ok-btn ${modal.type}`} onClick={handleModalOk}>
+              OK
+            </button>
+          </div>
         </div>
       )}
 
