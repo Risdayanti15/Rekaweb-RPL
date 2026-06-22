@@ -1,0 +1,38 @@
+body {
+  margin: 0;
+  font-family: sans-serif;
+  background-color: #c6d9e6;
+}
+
+.container {
+  padding: 40px;
+}
+
+.navbar {
+  font-weight: bold;
+}
+
+.hero {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 50px;
+}
+
+.text h1 {
+  font-size: 40px;
+}
+
+.text span {
+  color: #1e73be;
+}
+
+button {
+  margin-top: 20px;
+  padding: 12px 20px;
+  background-color: #1e73be;
+  color: white;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+}

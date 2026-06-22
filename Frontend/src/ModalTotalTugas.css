@@ -1,0 +1,248 @@
+/* ===================================================
+   ModalTotalTugas.css
+   =================================================== */
+
+/* OVERLAY — layar penuh semi transparan */
+.mtt-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: mttFadeIn 0.2s ease;
+}
+
+@keyframes mttFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* CONTAINER — kotak modal */
+.mtt-container {
+  position: relative;
+  width: 90%;
+  max-width: 480px;
+  max-height: 85vh;
+  border-radius: 20px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  animation: mttSlideUp 0.25s ease;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+}
+
+@keyframes mttSlideUp {
+  from { transform: translateY(30px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+
+/* BACKGROUND GAMBAR BIRU */
+.mtt-bg {
+  position: absolute;
+  inset: 0;
+  background-image: url("/src/assets/blue-bg.png"); /* ganti path sesuai lokasi gambar referensi */
+  background-size: cover;
+  background-position: center;
+  /* Fallback gradient kalau gambar belum ada */
+  background-color: #1034a6;
+  background-blend-mode: normal;
+  z-index: 0;
+}
+
+/* Overlay gelap tipis di atas background supaya teks tetap terbaca */
+.mtt-bg::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(10, 20, 80, 0.35);
+}
+
+/* PANEL — konten di atas background */
+.mtt-panel {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+/* HEADER */
+.mtt-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18px 20px 14px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.mtt-header-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.mtt-header-icon {
+  font-size: 18px;
+  color: white;
+}
+
+.mtt-header h2 {
+  font-size: 18px;
+  font-weight: 700;
+  color: white;
+  font-family: "Poppins", sans-serif;
+}
+
+.mtt-header-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.mtt-edit-btn {
+  background: transparent;
+  border: 1.5px solid rgba(255, 255, 255, 0.6);
+  color: white;
+  padding: 5px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-family: "Poppins", sans-serif;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.mtt-edit-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.mtt-delete-icon {
+  font-size: 18px;
+  cursor: pointer;
+  opacity: 0.8;
+  transition: opacity 0.2s;
+}
+
+.mtt-delete-icon:hover {
+  opacity: 1;
+}
+
+/* LIST */
+.mtt-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,0.3) transparent;
+}
+
+.mtt-list::-webkit-scrollbar { width: 5px; }
+.mtt-list::-webkit-scrollbar-track { background: transparent; }
+.mtt-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.3); border-radius: 10px; }
+
+/* ITEM */
+.mtt-item {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 12px;
+  padding: 14px 16px;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  transition: transform 0.15s;
+}
+
+.mtt-item:hover {
+  transform: translateX(3px);
+}
+
+/* DOT STATUS */
+.mtt-item-left {
+  padding-top: 4px;
+}
+
+.mtt-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* BODY */
+.mtt-item-body {
+  flex: 1;
+}
+
+.mtt-item-matkul {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+
+.mtt-matkul-icon {
+  font-size: 13px;
+  color: #555;
+}
+
+.mtt-matkul-name {
+  font-size: 12px;
+  color: #555;
+  font-weight: 500;
+}
+
+.mtt-item-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: #111;
+  margin-bottom: 3px;
+  font-family: "Poppins", sans-serif;
+}
+
+.mtt-item-deadline {
+  font-size: 12px;
+  color: #888;
+  margin-bottom: 2px;
+}
+
+.mtt-item-desc {
+  font-size: 12px;
+  color: #2d7dd2;
+  font-weight: 500;
+}
+
+/* EMPTY */
+.mtt-empty {
+  text-align: center;
+  color: rgba(255,255,255,0.8);
+  font-size: 14px;
+  padding: 40px 0;
+}
+
+/* FOOTER */
+.mtt-footer {
+  padding: 14px 20px 20px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.mtt-kembali-btn {
+  background: rgba(255, 255, 255, 0.15);
+  border: 1.5px solid rgba(255, 255, 255, 0.5);
+  color: white;
+  padding: 9px 28px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-family: "Poppins", sans-serif;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.mtt-kembali-btn:hover {
+  background: rgba(255, 255, 255, 0.28);
+}

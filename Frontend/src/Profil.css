@@ -1,0 +1,414 @@
+/* ============================================================
+   PROFIL PAGE — wrapper tengah
+   ============================================================ */
+.profil-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - 70px); /* kurangi tinggi header */
+  padding: 30px 20px;
+}
+.profil-page-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: #1a1a2e;
+  margin-bottom: 24px;
+  align-self: flex-start;
+  padding-left: calc(50% - 340px); /* sejajar dengan card */
+}
+/* ============================================================
+   PROFIL CARD
+   ============================================================ */
+.profil-card {
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+  padding: 36px 40px 32px;
+  width: 100%;
+  max-width: 680px;
+}
+/* ============================================================
+   AVATAR AREA
+   ============================================================ */
+.profil-avatar-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 24px;
+}
+.profil-avatar-circle {
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  background: #2d7dd2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 42px;
+  margin-bottom: 14px;
+  box-shadow: 0 4px 14px rgba(45, 125, 210, 0.35);
+}
+.profil-name {
+  font-size: 20px;
+  font-weight: 700;
+  color: #1a1a2e;
+  margin: 0 0 4px;
+}
+.profil-email {
+  font-size: 13px;
+  color: #888;
+  margin: 0;
+}
+/* ============================================================
+   DIVIDER
+   ============================================================ */
+.profil-divider {
+  border: none;
+  border-top: 1px solid #f0f0f0;
+  margin: 16px 0;
+}
+/* ============================================================
+   SECTION TITLE
+   ============================================================ */
+.profil-section-title {
+  font-size: 11px;
+  font-weight: 700;
+  color: #2d7dd2;
+  letter-spacing: 1px;
+  margin: 0 0 12px;
+}
+/* ============================================================
+   ROW (label + value)
+   ============================================================ */
+.profil-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid #f5f5f5;
+}
+.profil-row:last-of-type {
+  border-bottom: none;
+}
+.profil-label {
+  font-size: 13px;
+  color: #888;
+  font-weight: 400;
+}
+.profil-value {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1a1a2e;
+  text-align: right;
+}
+.profil-value.empty {
+  color: #bbb;
+  font-weight: 400;
+  font-style: italic;
+}
+/* ============================================================
+   EDIT BUTTON
+   ============================================================ */
+.profil-edit-btn {
+  margin-top: 24px;
+  width: 100%;
+  padding: 13px;
+  background: #1e3c72;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  font-family: "Poppins", sans-serif;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.15s ease;
+}
+.profil-edit-btn:hover {
+  background: #1e3c72 ;
+  transform: translateY(-1px);
+}
+
+/* ============================================================
+   CONFIRM MODAL (pengganti window.confirm)
+   ============================================================ */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+
+.confirm-box {
+  background: white;
+  border-radius: 16px;
+  padding: 32px 28px;
+  width: 380px;
+  max-width: 90vw;
+  text-align: center;
+  animation: popIn 0.2s ease;
+}
+
+.confirm-icon {
+  font-size: 42px;
+  margin-bottom: 14px;
+}
+
+.confirm-box h3 {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1a1a2e;
+  margin-bottom: 8px;
+}
+
+.confirm-box p {
+  font-size: 14px;
+  color: #888;
+  margin-bottom: 4px;
+}
+
+.confirm-footer {
+  display: flex;
+  gap: 12px;
+  margin-top: 22px;
+}
+
+.confirm-footer .btn-cancel {
+  flex: 1;
+  padding: 13px;
+  border: 1px solid #e0e0e0;
+  border-radius: 10px;
+  background: none;
+  color: #555;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: "Poppins", sans-serif;
+}
+
+.confirm-footer .profil-edit-btn {
+  margin-top: 0;
+  flex: 1;
+}
+
+@keyframes popIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+/* ================================================
+   BOTTOM NAVIGATION (default disembunyikan)
+   ================================================ */
+.bottom-nav {
+  display: none;
+}
+
+/* ================================================
+   RESPONSIVE MOBILE
+   ================================================ */
+@media (max-width: 768px) {
+
+  /* Sembunyikan sidebar */
+  .sidebar {
+    display: none !important;
+  }
+
+  /* Main full width */
+  .dashboard .main {
+    margin-left: 0 !important;
+    width: 100% !important;
+    padding-bottom: 75px;
+  }
+
+  /* HEADER */
+  .header {
+    flex-direction: column;
+    gap: 10px;
+    padding: 12px 16px;
+  }
+  .search-box {
+    width: 100%;
+  }
+  .search-box input {
+    width: 100%;
+    box-sizing: border-box;
+  }
+  .icons {
+    width: 100%;
+    justify-content: flex-end;
+    gap: 10px;
+  }
+  .btn-logout {
+    font-size: 12px;
+    padding: 6px 12px;
+  }
+
+  /* PROFIL PAGE */
+  .profil-page {
+    padding: 12px 16px;
+  }
+  .profil-page-title {
+    font-size: 18px;
+    margin-bottom: 14px;
+  }
+
+  /* PROFIL CARD */
+  .profil-card {
+    width: 100% !important;
+    max-width: 100% !important;
+    border-radius: 16px;
+    padding: 20px 16px !important;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+  }
+
+  /* AVATAR */
+  .profil-avatar-wrap {
+    padding: 10px 0 16px;
+  }
+  .profil-avatar-circle {
+    width: 72px !important;
+    height: 72px !important;
+    font-size: 32px !important;
+    margin-bottom: 10px;
+  }
+  .profil-name {
+    font-size: 18px !important;
+  }
+  .profil-email {
+    font-size: 13px !important;
+  }
+
+  /* SECTION TITLE */
+  .profil-section-title {
+    font-size: 11px !important;
+    letter-spacing: 0.8px;
+    margin: 14px 0 8px !important;
+  }
+
+  /* PROFIL ROW - stack vertikal di HP */
+  .profil-row {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 3px !important;
+    padding: 10px 0 !important;
+  }
+  .profil-label {
+    font-size: 11px !important;
+    color: #999 !important;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .profil-value {
+    font-size: 14px !important;
+    color: #222;
+  }
+  .profil-value.empty {
+    font-size: 13px !important;
+    color: #bbb !important;
+  }
+
+  /* TOMBOL EDIT PROFIL */
+  .profil-edit-btn {
+    width: 100% !important;
+    margin-top: 18px !important;
+    padding: 13px 0 !important;
+    font-size: 15px !important;
+    border-radius: 12px !important;
+    text-align: center;
+  }
+
+  /* DIVIDER */
+  .profil-divider {
+    margin: 14px 0 !important;
+  }
+
+  /* CONFIRM BOX */
+  .confirm-box {
+    width: 88vw;
+    padding: 20px 16px;
+    border-radius: 16px;
+  }
+  .confirm-box h3 {
+    font-size: 16px;
+  }
+  .confirm-box p {
+    font-size: 13px;
+  }
+  .confirm-footer {
+    flex-direction: row !important;
+    gap: 8px;
+    margin-top: 16px;
+  }
+  .confirm-footer .btn-cancel,
+  .confirm-footer .profil-edit-btn {
+    flex: 1;
+    padding: 10px 0 !important;
+    font-size: 13px !important;
+    text-align: center;
+    margin-top: 0 !important;
+  }
+
+  /* BOTTOM NAVIGATION */
+  .bottom-nav {
+    display: flex;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 65px;
+    background: #ffffff;
+    border-top: 1px solid #e8e8e8;
+    box-shadow: 0 -3px 12px rgba(0, 0, 0, 0.08);
+    z-index: 1000;
+  }
+  .bottom-nav-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    color: #aaa;
+    padding: 8px 4px;
+    transition: color 0.2s ease;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .bottom-nav-item.active {
+    color: #2d7dd2;
+  }
+  .bottom-nav-item:active {
+    background: rgba(45, 125, 210, 0.08);
+    border-radius: 8px;
+  }
+  .bottom-nav-icon {
+    font-size: 20px;
+    line-height: 1;
+  }
+  .bottom-nav-label {
+    font-size: 10px;
+    font-weight: 500;
+    line-height: 1;
+  }
+  .bottom-nav-item.active .bottom-nav-label {
+    font-weight: 700;
+  }
+}
+
+/* Pastikan bottom-nav tidak tampil di desktop */
+@media (min-width: 769px) {
+  .bottom-nav {
+    display: none !important;
+  }
+}
