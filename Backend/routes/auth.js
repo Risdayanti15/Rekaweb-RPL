@@ -24,7 +24,7 @@ const verifyToken = (req, res, next) => {
 };
 
 // ============================================================
-// REGISTER
+// REGISTER (Sesuaikan agar menerima input dengan aman)
 // ============================================================
 router.post('/register',
   body('name')
@@ -34,7 +34,6 @@ router.post('/register',
     .isLength({ min: 2, max: 100 }).withMessage('Nama minimal 2 karakter!'),
   body('email')
     .trim()
-    // ✂️ HAPUS BARIS .normalizeEmail() DI SINI
     .notEmpty().withMessage('Email wajib diisi!')
     .isEmail().withMessage('Format email tidak valid!'),
   body('password')
@@ -45,11 +44,13 @@ router.post('/register',
   async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
+      // 💡 Biar kamu tahu persis apa yang bikin eror 400, cek log ini di VS Code/Railway console:
+      console.log("❌ Eror Validasi:", errors.array()); 
       return res.status(400).json({ errors: errors.array() });
     }
 
     try {
-      const { name, email, password } = req.body;
+      const { name, email, password } = req.body; // Ambil 3 data utama saja, abaikan konfirmasi password lokal
 
       const existingUser = await User.findOne({ where: { email } });
       if (existingUser) {
@@ -63,7 +64,7 @@ router.post('/register',
       const token = jwt.sign(
         { id: user.id, email: user.email },
         process.env.JWT_SECRET,
-        { expiresIn: process.env.JWT_EXPIRES }
+        { expiresIn: process.env.JWT_EXPIRES || '1d' } // Fallback aman jika JWT_EXPIRES lupa diset di Railway
       );
 
       const { password: _, ...userData } = user.toJSON();
