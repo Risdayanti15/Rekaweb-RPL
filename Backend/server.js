@@ -3,17 +3,24 @@ const cors = require('cors');
 require('dotenv').config();
 const app = express();
 
-// ✅ TAMBAHKAN BARIS INI: Agar server otomatis memicu koneksi database saat menyala
-require('./config/config'); 
-
+// 👑 1. PENGATURAN CORS (Wajib di Atas Sebelum Rute API)
 app.use(cors({
-    origin: "http://localhost:5173", // Mengizinkan alamat frontend lokalmu
-    credentials: true,               // Wajib true karena di frontend api.js kita pakai withCredentials: true
-    methods: ["GET", "POST", "PUT", "DELETE"],
+    origin: "http://localhost:5173", // Mengizinkan frontend lokal Anda
+    credentials: true,               // Wajib true jika frontend Anda mengirim token/cookie (withCredentials)
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"]
 }));
+
+// 📦 2. Middleware Parser JSON
 app.use(express.json());
 
+// 🗄️ 3. SINKRONISASI DATABASE (Menggunakan Sequelize ORM dari folder models)
+const db = require('./models');
+db.sequelize.sync()
+  .then(() => console.log('⚡ Database Berhasil Sinkron via Sequelize ORM!'))
+  .catch(err => console.error('❌ Gagal sinkronisasi database:', err.message));
+
+// 🛣️ 4. DEKLARASI RUTE API
 const authRoutes = require('./routes/auth');
 const taskRoutes = require('./routes/tasks');
 const groupRoutes = require('./routes/groups');
@@ -29,7 +36,7 @@ app.get('/health', (req, res) => {
 // Untuk Vercel - export app
 module.exports = app;
 
-// Untuk local - jalankan server
+// Untuk local & Railway - jalankan server
 if (require.main === module) {
   const PORT = process.env.PORT || 3001;
   app.listen(PORT, () => {
