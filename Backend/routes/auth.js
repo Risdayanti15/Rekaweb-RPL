@@ -15,7 +15,9 @@ const verifyToken = (req, res, next) => {
   if (!token) return res.status(401).json({ message: 'Token tidak ada!' });
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    // 💡 Gunakan fallback kunci rahasia cadangan agar verifikasi token tidak crash jika env kosong
+    const secretKey = process.env.JWT_SECRET || 'KunciRahasiaCadanganIGNISBOT123!';
+    const decoded = jwt.verify(token, secretKey);
     req.user = decoded;
     next();
   } catch {
@@ -24,7 +26,7 @@ const verifyToken = (req, res, next) => {
 };
 
 // ============================================================
-// REGISTER (Sesuaikan agar menerima input dengan aman)
+// REGISTER
 // ============================================================
 router.post('/register',
   body('name')
@@ -44,13 +46,12 @@ router.post('/register',
   async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      // 💡 Biar kamu tahu persis apa yang bikin eror 400, cek log ini di VS Code/Railway console:
       console.log("❌ Eror Validasi:", errors.array()); 
       return res.status(400).json({ errors: errors.array() });
     }
 
     try {
-      const { name, email, password } = req.body; // Ambil 3 data utama saja, abaikan konfirmasi password lokal
+      const { name, email, password } = req.body;
 
       const existingUser = await User.findOne({ where: { email } });
       if (existingUser) {
@@ -58,13 +59,14 @@ router.post('/register',
       }
 
       const hashedPassword = await bcrypt.hash(password, 10);
-
       const user = await User.create({ name, email, password: hashedPassword });
 
+      // ⚡ Amankan jwt.sign dengan secret key cadangan murni
+      const secretKey = process.env.JWT_SECRET || 'KunciRahasiaCadanganIGNISBOT123!';
       const token = jwt.sign(
         { id: user.id, email: user.email },
-        process.env.JWT_SECRET,
-        { expiresIn: process.env.JWT_EXPIRES || '1d' } // Fallback aman jika JWT_EXPIRES lupa diset di Railway
+        secretKey,
+        { expiresIn: process.env.JWT_EXPIRES || '1d' }
       );
 
       const { password: _, ...userData } = user.toJSON();
@@ -88,7 +90,6 @@ router.post('/register',
 router.post('/login',
   body('email')
     .trim()
-    // ✂️ HAPUS BARIS .normalizeEmail() DI SINI
     .notEmpty().withMessage('Email wajib diisi!')
     .isEmail().withMessage('Format email tidak valid!'),
   body('password')
@@ -115,9 +116,11 @@ router.post('/login',
         return res.status(401).json({ message: 'Email atau password salah!' });
       }
 
+      // ⚡ Amankan jwt.sign dengan secret key cadangan murni agar bebas eror 500
+      const secretKey = process.env.JWT_SECRET || 'KunciRahasiaCadanganIGNISBOT123!';
       const token = jwt.sign(
         { id: user.id, email: user.email },
-        process.env.JWT_SECRET,
+        secretKey,
         { expiresIn: process.env.JWT_EXPIRES || '1d' }
       );
 
