@@ -18,7 +18,7 @@ function Login() {
       return;
     }
     try {
-      const response = await api.post("/auth/login", { email, password });
+      const response = await api.post("https://rekaweb-rpl-production.up.railway.app/api/auth/login", { email, password });
       localStorage.setItem("token", response.data.token);
       localStorage.setItem("user", JSON.stringify(response.data.user));
       setShowSuccess(true);
