@@ -22,7 +22,7 @@ app.use(express.json());
 const db = require('./models');
 
 // ⚡ SEMENTARA MENGGUNAKAN { force: true } UNTUK MEMBERSIHKAN TABEL DAN STRUKTUR ENKRIPSI YANG KORUP
-db.sequelize.sync({ force: true }) 
+db.sequelize.sync({ alter: true }) 
   .then(() => console.log('⚡ Database Berhasil Sinkron & Tabel Dibersihkan Total via Sequelize!'))
   .catch(err => console.error('❌ Gagal sinkronisasi database:', err.message));
 
