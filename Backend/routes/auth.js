@@ -50,7 +50,7 @@ router.post('/register',
       return res.status(400).json({ errors: errors.array() });
     }
 
-    try {
+try {
       const { name, email, password } = req.body;
 
       const existingUser = await User.findOne({ where: { email } });
@@ -59,7 +59,15 @@ router.post('/register',
       }
 
       const hashedPassword = await bcrypt.hash(password, 10);
-      const user = await User.create({ name, email, password: hashedPassword });
+      
+      // 🎯 FIX UTAMA: Tambahkan kolom role (misal: 'mahasiswa' atau 'customer') 
+      // agar tidak memicu error 'Field role doesn't have a default value' di MySQL
+      const user = await User.create({ 
+        name, 
+        email, 
+        password: hashedPassword,
+        role: 'mahasiswa' // 💡 Menjaga kestabilan kolom database web RPL kamu
+      });
 
       // ⚡ Amankan jwt.sign dengan secret key cadangan murni
       const secretKey = process.env.JWT_SECRET || 'KunciRahasiaCadanganIGNISBOT123!';
