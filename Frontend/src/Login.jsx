@@ -17,16 +17,10 @@ function Login() {
       alert("Email dan password harus diisi!");
       return;
     }
-
     try {
-      const response = await api.post(
-        "https://rekaweb-rpl-production.up.railway.app/api/auth/login",
-        { email, password }
-      );
-
+      const response = await api.post("/auth/login", { email, password });
       localStorage.setItem("token", response.data.token);
       localStorage.setItem("user", JSON.stringify(response.data.user));
-
       setShowSuccess(true);
     } catch (error) {
       if (error.response) {
@@ -57,39 +51,19 @@ function Login() {
               transition={{ type: "spring", stiffness: 300, damping: 20 }}
             >
               <div className="success-icon">
-                <svg
-                  viewBox="0 0 52 52"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <circle cx="26" cy="26" r="26" fill="#2f80ed" />
-                  <path
-                    d="M14 27L22 35L38 19"
-                    stroke="white"
-                    strokeWidth="4"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
+                <svg viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="26" cy="26" r="26" fill="#2f80ed"/>
+                  <path d="M14 27L22 35L38 19" stroke="white" strokeWidth="4"
+                    strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
               </div>
-
               <h2 className="success-title">Success</h2>
-              <p className="success-msg">
-                Woah, login berhasil! Selamat datang 🎉
-              </p>
-
+              <p className="success-msg">Woah, login berhasil! Selamat datang 🎉</p>
               <div className="success-actions">
-                <button
-                  className="btn-cancel"
-                  onClick={() => setShowSuccess(false)}
-                >
+                <button className="btn-cancel" onClick={() => setShowSuccess(false)}>
                   Cancel
                 </button>
-
-                <button
-                  className="btn-dashboard"
-                  onClick={() => navigate("/dashboard")}
-                >
+                <button className="btn-dashboard" onClick={() => navigate("/dashboard")}>
                   Dashboard
                 </button>
               </div>
@@ -107,7 +81,6 @@ function Login() {
             <strong>Tugas Mahasiswa</strong>
           </div>
         </div>
-
         <div className="illustration">
           <motion.img
             src={ilustrasi}
@@ -124,42 +97,37 @@ function Login() {
         <div className="form-box">
           <h2>Login</h2>
           <p>Masuk ke akun Anda</p>
-
           <input
             type="email"
             placeholder="Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
-
           <input
             type="password"
             placeholder="Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
-
           <div className="extra">
             <label>
-              <input type="checkbox" />
-              {" "}Remember me
+              <input type="checkbox" /> Remember me
             </label>
-
             <span className="forgot">Lupa Password?</span>
           </div>
-
           <button onClick={handleLogin}>Login</button>
-
           <p className="register-text">
             Belum punya akun?{" "}
-            <span onClick={() => navigate("/register")}>
-              Daftar
-            </span>
+            <span onClick={() => navigate("/register")}>Daftar</span>
           </p>
-
+          <div className="google">
+            <img
+              src="https://www.svgrepo.com/show/475656/google-color.svg"
+              alt="google"
+            />
+          </div>
         </div>
       </div>
-
     </div>
   );
 }
