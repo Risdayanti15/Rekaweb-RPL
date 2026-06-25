@@ -242,7 +242,7 @@ const Dashboard = () => {
   const modalTasks = getModalTasks();
   const groupedTasks = groupTasksByType(modalTasks);
 
-  /* ─── Style overlay & confirm box ─── */
+  /* ─── Style overlay & confirm box (fix Android tenggelam) ─── */
   const overlayStyle = {
     position: "fixed",
     inset: 0,
@@ -301,30 +301,30 @@ const Dashboard = () => {
       <div className="main" style={{ position: "relative" }}>
 
         {/* ══════════════════════════════════════
-            HEADER — diperbaiki untuk mobile
-            Baris 1: search bar full width
-            Baris 2: notif + logout rata kanan
+            HEADER — satu baris: search | notif | logout
         ══════════════════════════════════════ */}
         <div className="header" style={{
           display: "flex",
-          flexDirection: "column",
-          gap: "10px",
+          alignItems: "center",
+          gap: "8px",
           padding: "12px 16px",
+          background: "#fff",
+          boxSizing: "border-box",
+          width: "100%",
         }}>
 
-          {/* Baris 1: Search bar */}
-          <div className="search-box" style={{
+          {/* Search bar — mengisi sisa ruang */}
+          <div style={{
+            flex: 1,
             display: "flex",
             alignItems: "center",
-            background: "#fff",
-            border: "1px solid #e0e0e0",
-            borderRadius: "12px",
-            padding: "10px 14px",
-            gap: "8px",
-            width: "100%",
-            boxSizing: "border-box",
+            background: "#f4f4f4",
+            borderRadius: "10px",
+            padding: "8px 12px",
+            gap: "6px",
+            minWidth: 0,
           }}>
-            <span style={{ fontSize: "18px" }}>🔍</span>
+            <span style={{ fontSize: "16px", flexShrink: 0 }}>🔍</span>
             <input
               type="text"
               placeholder="Cari tugas..."
@@ -332,137 +332,124 @@ const Dashboard = () => {
                 border: "none",
                 outline: "none",
                 background: "transparent",
-                fontSize: "14px",
+                fontSize: "13px",
                 color: "#333",
                 width: "100%",
+                minWidth: 0,
               }}
             />
           </div>
 
-          {/* Baris 2: Notif + Logout */}
-          <div style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "flex-end",
-            gap: "10px",
-          }}>
-
-            {/* Notifikasi Bell */}
-            <div
-              className="notif-wrapper"
-              ref={notifRef}
-              style={{ position: "relative" }}
+          {/* Notif Bell */}
+          <div ref={notifRef} style={{ position: "relative", flexShrink: 0 }}>
+            <button
+              onClick={() => setShowNotif(!showNotif)}
+              style={{
+                width: "38px",
+                height: "38px",
+                borderRadius: "10px",
+                border: "1px solid #e0e0e0",
+                background: "#fff",
+                fontSize: "18px",
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                position: "relative",
+                flexShrink: 0,
+              }}
             >
-              <div
-                className="notif-bell"
-                onClick={() => setShowNotif(!showNotif)}
-                style={{
-                  width: "40px",
-                  height: "40px",
-                  borderRadius: "10px",
-                  background: "#fff",
-                  border: "1px solid #e0e0e0",
+              🔔
+              {notifTasks.length > 0 && (
+                <span style={{
+                  position: "absolute",
+                  top: "-4px",
+                  right: "-4px",
+                  background: "#e53935",
+                  color: "#fff",
+                  fontSize: "9px",
+                  fontWeight: "700",
+                  borderRadius: "50%",
+                  width: "16px",
+                  height: "16px",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  fontSize: "20px",
-                  cursor: "pointer",
-                  position: "relative",
-                }}
-              >
-                🔔
-                {notifTasks.length > 0 && (
-                  <span className="notif-badge" style={{
-                    position: "absolute",
-                    top: "-4px",
-                    right: "-4px",
-                    background: "#e53935",
-                    color: "#fff",
-                    fontSize: "10px",
-                    fontWeight: "700",
-                    borderRadius: "50%",
-                    width: "18px",
-                    height: "18px",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}>
-                    {notifTasks.length}
-                  </span>
+                }}>
+                  {notifTasks.length}
+                </span>
+              )}
+            </button>
+
+            {/* Dropdown notif */}
+            {showNotif && (
+              <div style={{
+                position: "absolute",
+                top: "46px",
+                right: "0",
+                width: "290px",
+                maxWidth: "85vw",
+                background: "#fff",
+                borderRadius: "14px",
+                boxShadow: "0 8px 24px rgba(0,0,0,0.15)",
+                zIndex: 999,
+                overflow: "hidden",
+              }}>
+                <div style={{
+                  padding: "12px 16px",
+                  fontWeight: "600",
+                  fontSize: "13px",
+                  borderBottom: "1px solid #f0f0f0",
+                  background: "#f8f8f8",
+                }}>
+                  🔔 Notifikasi Deadline
+                </div>
+                {notifTasks.length === 0 ? (
+                  <div style={{ padding: "16px", fontSize: "13px", color: "#888", textAlign: "center" }}>
+                    Tidak ada deadline mendekat 🎉
+                  </div>
+                ) : (
+                  notifTasks.map((task) => {
+                    const sisa = getSisaHari(task.deadline);
+                    return (
+                      <div key={task.id} style={{ padding: "10px 16px", borderBottom: "1px solid #f0f0f0" }}>
+                        <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "3px" }}>
+                          <span style={{ fontWeight: "600", fontSize: "12px", color: "#333" }}>{task.title}</span>
+                          <span style={{ color: getNotifColor(sisa), fontSize: "11px", fontWeight: "600", whiteSpace: "nowrap", marginLeft: "6px" }}>
+                            {getNotifLabel(sisa)}
+                          </span>
+                        </div>
+                        <div style={{ display: "flex", justifyContent: "space-between" }}>
+                          <span style={{ fontSize: "11px", color: "#888" }}>{task.type}</span>
+                          <span style={{ fontSize: "11px", color: "#888" }}>📅 {formatDeadline(task.deadline)}</span>
+                        </div>
+                      </div>
+                    );
+                  })
                 )}
               </div>
-
-              {showNotif && (
-                <div className="notif-dropdown" style={{
-                  position: "absolute",
-                  top: "48px",
-                  right: "0",
-                  width: "300px",
-                  maxWidth: "90vw",
-                  background: "#fff",
-                  borderRadius: "14px",
-                  boxShadow: "0 8px 24px rgba(0,0,0,0.15)",
-                  zIndex: 999,
-                  overflow: "hidden",
-                }}>
-                  <div className="notif-header" style={{
-                    padding: "12px 16px",
-                    fontWeight: "600",
-                    fontSize: "14px",
-                    borderBottom: "1px solid #f0f0f0",
-                    background: "#f8f8f8",
-                  }}>
-                    🔔 Notifikasi Deadline
-                  </div>
-                  {notifTasks.length === 0 ? (
-                    <div className="notif-empty" style={{ padding: "16px", fontSize: "13px", color: "#888", textAlign: "center" }}>
-                      Tidak ada deadline mendekat 🎉
-                    </div>
-                  ) : (
-                    notifTasks.map((task) => {
-                      const sisa = getSisaHari(task.deadline);
-                      return (
-                        <div className="notif-item" key={task.id} style={{
-                          padding: "12px 16px",
-                          borderBottom: "1px solid #f0f0f0",
-                        }}>
-                          <div className="notif-item-top" style={{ display: "flex", justifyContent: "space-between", marginBottom: "4px" }}>
-                            <span className="notif-title" style={{ fontWeight: "600", fontSize: "13px", color: "#333" }}>{task.title}</span>
-                            <span className="notif-sisa" style={{ color: getNotifColor(sisa), fontSize: "12px", fontWeight: "600", whiteSpace: "nowrap", marginLeft: "8px" }}>
-                              {getNotifLabel(sisa)}
-                            </span>
-                          </div>
-                          <div className="notif-item-bottom" style={{ display: "flex", justifyContent: "space-between" }}>
-                            <span className="notif-matkul" style={{ fontSize: "12px", color: "#888" }}>{task.type}</span>
-                            <span className="notif-deadline" style={{ fontSize: "12px", color: "#888" }}>📅 {formatDeadline(task.deadline)}</span>
-                          </div>
-                        </div>
-                      );
-                    })
-                  )}
-                </div>
-              )}
-            </div>
-
-            {/* Tombol Logout */}
-            <button
-              onClick={handleLogout}
-              style={{
-                height: "40px",
-                padding: "0 18px",
-                borderRadius: "10px",
-                border: "1.5px solid #e53935",
-                background: "#fff",
-                color: "#e53935",
-                fontSize: "14px",
-                fontWeight: "600",
-                cursor: "pointer",
-                whiteSpace: "nowrap",
-              }}
-            >
-              Logout
-            </button>
+            )}
           </div>
+
+          {/* Tombol Logout */}
+          <button
+            onClick={handleLogout}
+            style={{
+              height: "38px",
+              padding: "0 14px",
+              borderRadius: "10px",
+              border: "1.5px solid #e53935",
+              background: "#fff",
+              color: "#e53935",
+              fontSize: "13px",
+              fontWeight: "600",
+              cursor: "pointer",
+              whiteSpace: "nowrap",
+              flexShrink: 0,
+            }}
+          >
+            Logout
+          </button>
         </div>
 
         {/* CONTENT */}
