@@ -1,8 +1,7 @@
 import "./Kelompok.css";
 import logo from "./assets/logo.png";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import NotifBell from "./NotifBell";
 
 function Kelompok() {
   const navigate = useNavigate();
@@ -10,11 +9,16 @@ function Kelompok() {
   const [showEditModal, setShowEditModal] = useState(false);
   const [editTarget, setEditTarget] = useState(null);
   const [groups, setGroups] = useState([]);
+  const [search, setSearch] = useState("");
   const [form, setForm] = useState({ nama: "", deskripsi: "", matkul: "", anggota: "", status: "" });
   const [editForm, setEditForm] = useState({ nama: "", deskripsi: "", matkul: "", anggota: "", status: "" });
+  const [showNotif, setShowNotif] = useState(false);
+  const [tasks, setTasks] = useState([]);
+  const notifRef = useRef(null);
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
 
   const [popup, setPopup] = useState({ show: false, message: "", type: "success" });
-  const [confirmModal, setConfirmModal] = useState({ show: false, type: "", targetId: null });
+  const [confirmHapus, setConfirmHapus] = useState({ show: false, targetId: null });
 
   const showPopup = (message, type = "success") => {
     setPopup({ show: true, message, type });
@@ -38,47 +42,90 @@ function Kelompok() {
     }
   };
 
+  const fetchTasks = async () => {
+    try {
+      const user = JSON.parse(localStorage.getItem("user"));
+      const res = await fetch(`https://rekaweb-rpl-production.up.railway.app/api/tasks?userId=${user.id}`);
+      const data = await res.json();
+      setTasks(data);
+    } catch (err) {
+      console.error("Gagal ambil tugas:", err);
+    }
+  };
+
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("user"));
     if (!user) { navigate("/"); return; }
     fetchGroups();
+    fetchTasks();
   }, []);
 
-  const handleLogout = () => {
-    setConfirmModal({ show: true, type: "logout", targetId: null });
-  };
-
-  const handleHapus = (id) => {
-    setConfirmModal({ show: true, type: "hapus", targetId: id });
-  };
-
-  const handleConfirmYes = async () => {
-    const { type, targetId } = confirmModal;
-    setConfirmModal({ show: false, type: "", targetId: null });
-
-    if (type === "logout") {
-      localStorage.removeItem("user");
-      navigate("/");
-      return;
-    }
-
-    if (type === "hapus") {
-      try {
-        const res = await fetch(`https://rekaweb-rpl-production.up.railway.app/api/groups/${targetId}`, { method: "DELETE" });
-        if (res.ok) {
-          showPopup("Kelompok berhasil dihapus! ✓");
-          fetchGroups();
-        } else {
-          showPopup("Gagal menghapus kelompok!", "error");
-        }
-      } catch (err) {
-        showPopup("Tidak dapat terhubung ke server!", "error");
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (notifRef.current && !notifRef.current.contains(e.target)) {
+        setShowNotif(false);
       }
-    }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  // ── Notif logic ──
+  const getSisaHari = (deadline) => {
+    if (!deadline) return null;
+    const diff = new Date(deadline) - new Date();
+    return Math.ceil(diff / (1000 * 60 * 60 * 24));
   };
 
-  const handleConfirmCancel = () => {
-    setConfirmModal({ show: false, type: "", targetId: null });
+  const notifTasks = tasks.filter((t) => {
+    if (t.status === "Selesai") return false;
+    const sisa = getSisaHari(t.deadline);
+    return sisa !== null && sisa >= 0 && sisa <= 7;
+  }).sort((a, b) => new Date(a.deadline) - new Date(b.deadline));
+
+  const getNotifColor = (sisa) => {
+    if (sisa <= 2) return "#e53935";
+    if (sisa <= 4) return "#f7931e";
+    return "#2d7dd2";
+  };
+
+  const getNotifLabel = (sisa) => {
+    if (sisa === 0) return "Deadline hari ini!";
+    if (sisa === 1) return "Deadline besok!";
+    return `Sisa ${sisa} hari lagi`;
+  };
+
+  const formatDeadline = (date) => {
+    if (!date) return "-";
+    return new Date(date).toLocaleDateString("id-ID", {
+      day: "numeric", month: "long", year: "numeric",
+    });
+  };
+
+  const handleLogout = () => setShowLogoutConfirm(true);
+  const handleConfirmLogout = () => {
+    setShowLogoutConfirm(false);
+    localStorage.removeItem("user");
+    navigate("/");
+  };
+  const handleCancelLogout = () => setShowLogoutConfirm(false);
+
+  const handleHapus = (id) => setConfirmHapus({ show: true, targetId: id });
+  const handleCancelHapus = () => setConfirmHapus({ show: false, targetId: null });
+  const handleConfirmHapus = async () => {
+    const id = confirmHapus.targetId;
+    setConfirmHapus({ show: false, targetId: null });
+    try {
+      const res = await fetch(`https://rekaweb-rpl-production.up.railway.app/api/groups/${id}`, { method: "DELETE" });
+      if (res.ok) {
+        showPopup("Kelompok berhasil dihapus! ✓");
+        fetchGroups();
+      } else {
+        showPopup("Gagal menghapus kelompok!", "error");
+      }
+    } catch (err) {
+      showPopup("Tidak dapat terhubung ke server!", "error");
+    }
   };
 
   const handleTambah = async () => {
@@ -152,18 +199,24 @@ function Kelompok() {
     }
   };
 
-  /* ─── Style helper untuk overlay & modal-box ─── */
+  const filteredGroups = groups.filter(
+    (g) =>
+      g.nama.toLowerCase().includes(search.toLowerCase()) ||
+      g.matkul.toLowerCase().includes(search.toLowerCase())
+  );
+
+  // ── Style helpers (sama dengan Dashboard) ──
   const overlayStyle = {
     position: "fixed",
     inset: 0,
     backgroundColor: "rgba(0,0,0,0.5)",
     zIndex: 1000,
     display: "flex",
-    alignItems: "flex-start",       /* mulai dari atas agar tidak terpotong */
+    alignItems: "flex-start",
     justifyContent: "center",
-    overflowY: "auto",              /* overlay sendiri bisa di-scroll */
+    overflowY: "auto",
     paddingTop: "env(safe-area-inset-top, 16px)",
-    paddingBottom: "80px",          /* beri ruang di bawah untuk bottom nav */
+    paddingBottom: "80px",
     WebkitOverflowScrolling: "touch",
   };
 
@@ -176,8 +229,6 @@ function Kelompok() {
     marginTop: "16px",
     marginBottom: "16px",
     boxSizing: "border-box",
-    /* TIDAK pakai maxHeight di sini — biarkan konten menentukan tinggi,
-       overlay-lah yang di-scroll. Ini cara paling andal di Android. */
   };
 
   const confirmBoxStyle = {
@@ -195,7 +246,7 @@ function Kelompok() {
   return (
     <div className="kelompok-page">
 
-      {/* POPUP NOTIFIKASI */}
+      {/* POPUP TOAST */}
       {popup.show && (
         <div className={`popup-toast ${popup.type}`}>
           <span className="popup-icon">{popup.type === "success" ? "✅" : "❌"}</span>
@@ -203,7 +254,7 @@ function Kelompok() {
         </div>
       )}
 
-      {/* SIDEBAR - hanya tampil di desktop */}
+      {/* SIDEBAR */}
       <div className="sidebar">
         <div className="logo-area">
           <img src={logo} alt="logo" />
@@ -219,27 +270,164 @@ function Kelompok() {
       </div>
 
       {/* MAIN */}
-      <div className="main">
-        <div className="topbar">
-          <div>
-            <h2>👥 Tugas Kelompok</h2>
-            <p>Kelola tugas bersama tim</p>
+      <div className="main" style={{ position: "relative" }}>
+
+        {/* ── HEADER — sama persis dengan Dashboard ── */}
+        <div style={{
+          display: "flex",
+          alignItems: "center",
+          gap: "8px",
+          padding: "12px 16px",
+          background: "#fff",
+          boxSizing: "border-box",
+          width: "100%",
+          position: "relative",
+          zIndex: 10,
+        }}>
+          {/* Search bar */}
+          <div style={{
+            flex: 1,
+            display: "flex",
+            alignItems: "center",
+            background: "#f4f4f4",
+            borderRadius: "10px",
+            padding: "8px 12px",
+            gap: "6px",
+            minWidth: 0,
+          }}>
+            <span style={{ fontSize: "16px", flexShrink: 0 }}>🔍</span>
+            <input
+              type="text"
+              placeholder="Cari kelompok..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              style={{
+                border: "none",
+                outline: "none",
+                background: "transparent",
+                fontSize: "13px",
+                color: "#333",
+                width: "100%",
+                minWidth: 0,
+              }}
+            />
           </div>
-          <div className="icons">
-            <NotifBell />
-            <button className="btn-logout" onClick={handleLogout}>Logout</button>
+
+          {/* Notif Bell */}
+          <div ref={notifRef} style={{ position: "relative", flexShrink: 0 }}>
+            <button
+              onClick={() => setShowNotif(!showNotif)}
+              style={{
+                width: "38px",
+                height: "38px",
+                borderRadius: "10px",
+                border: "1px solid #e0e0e0",
+                background: "#fff",
+                fontSize: "18px",
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                position: "relative",
+                flexShrink: 0,
+              }}
+            >
+              🔔
+              {notifTasks.length > 0 && (
+                <span style={{
+                  position: "absolute",
+                  top: "-4px",
+                  right: "-4px",
+                  background: "#e53935",
+                  color: "#fff",
+                  fontSize: "9px",
+                  fontWeight: "700",
+                  borderRadius: "50%",
+                  width: "16px",
+                  height: "16px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}>
+                  {notifTasks.length}
+                </span>
+              )}
+            </button>
+
+            {/* Dropdown notif */}
+            {showNotif && (
+              <div style={{
+                position: "absolute",
+                top: "46px",
+                right: "0",
+                width: "290px",
+                maxWidth: "85vw",
+                background: "#fff",
+                borderRadius: "14px",
+                boxShadow: "0 8px 24px rgba(0,0,0,0.15)",
+                zIndex: 999,
+                overflow: "hidden",
+              }}>
+                <div style={{
+                  padding: "12px 16px",
+                  fontWeight: "600",
+                  fontSize: "13px",
+                  borderBottom: "1px solid #f0f0f0",
+                  background: "#f8f8f8",
+                }}>
+                  🔔 Notifikasi Deadline
+                </div>
+                {notifTasks.length === 0 ? (
+                  <div style={{ padding: "16px", fontSize: "13px", color: "#888", textAlign: "center" }}>
+                    Tidak ada deadline mendekat 🎉
+                  </div>
+                ) : (
+                  notifTasks.map((task) => {
+                    const sisa = getSisaHari(task.deadline);
+                    return (
+                      <div key={task.id} style={{ padding: "10px 16px", borderBottom: "1px solid #f0f0f0" }}>
+                        <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "3px" }}>
+                          <span style={{ fontWeight: "600", fontSize: "12px", color: "#333" }}>{task.title}</span>
+                          <span style={{ color: getNotifColor(sisa), fontSize: "11px", fontWeight: "600", whiteSpace: "nowrap", marginLeft: "6px" }}>
+                            {getNotifLabel(sisa)}
+                          </span>
+                        </div>
+                        <div style={{ display: "flex", justifyContent: "space-between" }}>
+                          <span style={{ fontSize: "11px", color: "#888" }}>{task.type}</span>
+                          <span style={{ fontSize: "11px", color: "#888" }}>📅 {formatDeadline(task.deadline)}</span>
+                        </div>
+                      </div>
+                    );
+                  })
+                )}
+              </div>
+            )}
           </div>
+
+          {/* Tombol Logout */}
+          <button
+            onClick={handleLogout}
+            style={{
+              height: "38px",
+              padding: "0 14px",
+              borderRadius: "10px",
+              border: "1.5px solid #e53935",
+              background: "#fff",
+              color: "#e53935",
+              fontSize: "13px",
+              fontWeight: "600",
+              cursor: "pointer",
+              whiteSpace: "nowrap",
+              flexShrink: 0,
+            }}
+          >
+            Logout
+          </button>
         </div>
 
+        {/* CONTENT */}
         <div className="content">
-
-          {/* SEARCH + TOMBOL TAMBAH */}
-          <div className="search-box">
-            <input type="text" placeholder="Cari tugas kelompok..." />
-            <button className="btn-tambah-desktop" onClick={() => setShowModal(true)}>
-              + Tambah Kelompok
-            </button>
-          </div>
+          <h2>Tugas Kelompok 👥</h2>
 
           {/* TABEL HEADER - hanya di desktop */}
           <div className="group-card">
@@ -250,10 +438,10 @@ function Kelompok() {
               <span>Aksi</span>
             </div>
 
-            {groups.length === 0 ? (
+            {filteredGroups.length === 0 ? (
               <p className="empty-msg">Belum ada kelompok.</p>
             ) : (
-              groups.map((g, i) => (
+              filteredGroups.map((g, i) => (
                 <div className="group-item" key={i}>
                   <div className="group-name">
                     <h4>{g.nama}</h4>
@@ -280,13 +468,44 @@ function Kelompok() {
           <div style={{ height: "80px" }} />
         </div>
 
-        {/* TOMBOL TAMBAH FLOATING - hanya di HP */}
+        {/* TOMBOL TAMBAH FLOATING */}
         <div className="fab-container">
           <button className="fab-btn" onClick={() => setShowModal(true)}>
             + Tambah Kelompok
           </button>
         </div>
-      </div>
+
+        {/* MODAL KONFIRMASI LOGOUT */}
+        {showLogoutConfirm && (
+          <div style={overlayStyle} onClick={handleCancelLogout}>
+            <div style={confirmBoxStyle} onClick={(e) => e.stopPropagation()}>
+              <div className="confirm-icon">⚠️</div>
+              <h3 className="confirm-title">Yakin Ingin Keluar?</h3>
+              <p className="confirm-message">Kamu akan keluar dari sesi TaskFlow ini.</p>
+              <div className="confirm-actions">
+                <button className="confirm-btn-no" onClick={handleCancelLogout}>Tidak</button>
+                <button className="confirm-btn-yes" onClick={handleConfirmLogout}>Ya, Keluar</button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* MODAL KONFIRMASI HAPUS */}
+        {confirmHapus.show && (
+          <div style={overlayStyle} onClick={handleCancelHapus}>
+            <div style={confirmBoxStyle} onClick={(e) => e.stopPropagation()}>
+              <div className="confirm-icon">🗑️</div>
+              <h3 className="confirm-title">Hapus Kelompok</h3>
+              <p className="confirm-message">Yakin ingin menghapus kelompok ini?<br />Tindakan ini tidak dapat dibatalkan.</p>
+              <div className="confirm-actions">
+                <button className="confirm-btn-no" onClick={handleCancelHapus}>Tidak</button>
+                <button className="confirm-btn-yes" onClick={handleConfirmHapus}>Ya, Hapus</button>
+              </div>
+            </div>
+          </div>
+        )}
+
+      </div>{/* end .main */}
 
       {/* BOTTOM NAVIGATION */}
       <div className="bottom-nav">
@@ -312,12 +531,7 @@ function Kelompok() {
         </button>
       </div>
 
-
-      {/* ══════════════════════════════════════
-          MODAL TAMBAH
-          Perbaikan: overlay bisa di-scroll,
-          modal-box tidak fixed height
-      ══════════════════════════════════════ */}
+      {/* MODAL TAMBAH */}
       {showModal && (
         <div style={overlayStyle} onClick={() => setShowModal(false)}>
           <div style={modalBoxStyle} onClick={e => e.stopPropagation()}>
@@ -362,9 +576,7 @@ function Kelompok() {
         </div>
       )}
 
-      {/* ══════════════════════════════════════
-          MODAL EDIT
-      ══════════════════════════════════════ */}
+      {/* MODAL EDIT */}
       {showEditModal && (
         <div style={overlayStyle} onClick={() => setShowEditModal(false)}>
           <div style={modalBoxStyle} onClick={e => e.stopPropagation()}>
@@ -405,36 +617,6 @@ function Kelompok() {
             <div className="modal-footer">
               <button className="btn-cancel" onClick={() => setShowEditModal(false)}>Batal</button>
               <button className="btn-submit" onClick={handleEdit}>Simpan Perubahan</button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ══════════════════════════════════════
-          MODAL KONFIRMASI (logout & hapus)
-      ══════════════════════════════════════ */}
-      {confirmModal.show && (
-        <div style={overlayStyle} onClick={handleConfirmCancel}>
-          <div style={confirmBoxStyle} onClick={e => e.stopPropagation()}>
-            <div className="confirm-icon">
-              {confirmModal.type === "logout" ? "⚠️" : "🗑️"}
-            </div>
-            <h3>
-              {confirmModal.type === "logout" ? "Yakin ingin keluar?" : "Yakin ingin menghapus kelompok ini?"}
-            </h3>
-            <p>
-              {confirmModal.type === "logout"
-                ? "Kamu akan keluar dari sesi TaskFlow ini."
-                : "Tindakan ini tidak dapat dibatalkan."}
-            </p>
-            <div className="confirm-footer">
-              <button className="btn-cancel" onClick={handleConfirmCancel}>Batal</button>
-              <button
-                className={confirmModal.type === "hapus" ? "btn-confirm-danger" : "btn-submit"}
-                onClick={handleConfirmYes}
-              >
-                {confirmModal.type === "logout" ? "Ya, Keluar" : "Ya, Hapus"}
-              </button>
             </div>
           </div>
         </div>
