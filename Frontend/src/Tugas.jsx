@@ -10,9 +10,10 @@ function Tugas() {
   const [tasks, setTasks] = useState([]);
   const [search, setSearch] = useState("");
   const [editTask, setEditTask] = useState(null);
+  
+  // State untuk Notifikasi (disamakan dengan Dashboard)
   const [showNotif, setShowNotif] = useState(false);
   const notifRef = useRef(null);
-  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
 
   const [popup, setPopup] = useState({
     show: false,
@@ -33,6 +34,7 @@ function Tugas() {
   const fetchTasks = async () => {
     try {
       const user = JSON.parse(localStorage.getItem("user"));
+      if (!user) { navigate("/"); return; }
       const response = await fetch(`https://rekaweb-rpl-production.up.railway.app/api/tasks?userId=${user.id}`);
       const data = await response.json();
       setTasks(data);
@@ -41,8 +43,11 @@ function Tugas() {
     }
   };
 
-  useEffect(() => { fetchTasks(); }, []);
+  useEffect(() => { 
+    fetchTasks(); 
+  }, []);
 
+  // Logika mendeteksi klik di luar dropdown notifikasi (disamakan dengan Dashboard)
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (notifRef.current && !notifRef.current.contains(e.target)) {
@@ -53,38 +58,12 @@ function Tugas() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // ── Notif logic (sama persis dengan Dashboard) ──
-  const getSisaHari = (deadline) => {
-    if (!deadline) return null;
-    const diff = new Date(deadline) - new Date();
-    return Math.ceil(diff / (1000 * 60 * 60 * 24));
+  const handleLogout = () => {
+    showPopup("confirm", "Keluar", "Yakin ingin keluar dari TaskFlow?", () => {
+      localStorage.removeItem("user");
+      navigate("/");
+    });
   };
-
-  const notifTasks = tasks.filter((t) => {
-    if (t.status === "Selesai") return false;
-    const sisa = getSisaHari(t.deadline);
-    return sisa !== null && sisa >= 0 && sisa <= 7;
-  }).sort((a, b) => new Date(a.deadline) - new Date(b.deadline));
-
-  const getNotifColor = (sisa) => {
-    if (sisa <= 2) return "#e53935";
-    if (sisa <= 4) return "#f7931e";
-    return "#2d7dd2";
-  };
-
-  const getNotifLabel = (sisa) => {
-    if (sisa === 0) return "Deadline hari ini!";
-    if (sisa === 1) return "Deadline besok!";
-    return `Sisa ${sisa} hari lagi`;
-  };
-
-  const handleLogout = () => setShowLogoutConfirm(true);
-  const handleConfirmLogout = () => {
-    setShowLogoutConfirm(false);
-    localStorage.removeItem("user");
-    navigate("/");
-  };
-  const handleCancelLogout = () => setShowLogoutConfirm(false);
 
   const handleSimpan = async (form) => {
     try {
@@ -162,24 +141,35 @@ function Tugas() {
     });
   };
 
-  const getStatusClass = (status) => {
-    if (status === "Belum") return "blue";
-    if (status === "Proses") return "orange";
-    if (status === "Selesai") return "green";
-    return "blue";
+  const getSisaHari = (deadline) => {
+    if (!deadline) return null;
+    const diff = new Date(deadline) - new Date();
+    return Math.ceil(diff / (1000 * 60 * 60 * 24));
   };
 
-  const getStatusLabel = (status) => {
-    if (status === "Belum") return "Belum dikerjakan";
-    if (status === "Proses") return "Sementara dikerjakan";
-    if (status === "Selesai") return "Selesai";
-    return status;
+  // Logika Filter Notifikasi (disamakan dengan Dashboard)
+  const notifTasks = tasks.filter((t) => {
+    if (t.status === "Selesai") return false;
+    const sisa = getSisaHari(t.deadline);
+    return sisa !== null && sisa >= 0 && sisa <= 7;
+  }).sort((a, b) => new Date(a.deadline) - new Date(b.deadline));
+
+  const getNotifColor = (sisa) => {
+    if (sisa <= 2) return "#e53935";
+    if (sisa <= 4) return "#f7931e";
+    return "#2d7dd2";
+  };
+
+  const getNotifLabel = (sisa) => {
+    if (sisa === 0) return "Deadline hari ini!";
+    if (sisa === 1) return "Deadline besok!";
+    return `Sisa ${sisa} hari lagi`;
   };
 
   const filteredTasks = tasks.filter(
     (task) =>
       task.title.toLowerCase().includes(search.toLowerCase()) ||
-      task.type.toLowerCase().includes(search.toLowerCase())
+      (task.type && task.type.toLowerCase().includes(search.toLowerCase()))
   );
 
   const grouped = filteredTasks.reduce((acc, task) => {
@@ -189,39 +179,17 @@ function Tugas() {
     return acc;
   }, {});
 
-  const popupIcon = { success: "✅", error: "❌", confirm: "⚠️", info: "ℹ️" };
-
-  // ── Style overlay & confirm box (sama dengan Dashboard) ──
-  const overlayStyle = {
-    position: "fixed",
-    inset: 0,
-    backgroundColor: "rgba(0,0,0,0.5)",
-    zIndex: 1000,
-    display: "flex",
-    alignItems: "flex-start",
-    justifyContent: "center",
-    overflowY: "auto",
-    paddingTop: "env(safe-area-inset-top, 16px)",
-    paddingBottom: "80px",
-    WebkitOverflowScrolling: "touch",
-  };
-
-  const confirmBoxStyle = {
-    background: "#fff",
-    borderRadius: "16px",
-    padding: "28px 20px",
-    width: "85%",
-    maxWidth: "360px",
-    marginTop: "30vh",
-    marginBottom: "16px",
-    textAlign: "center",
-    boxSizing: "border-box",
+  const popupIcon = {
+    success: "✅",
+    error: "❌",
+    confirm: "⚠️",
+    info: "ℹ️",
   };
 
   return (
     <div className="tugas-page">
 
-      {/* SIDEBAR */}
+      {/* SIDEBAR - hanya tampil di desktop */}
       <div className="sidebar">
         <div className="logo-area">
           <img src={logo} alt="logo" />
@@ -249,7 +217,10 @@ function Tugas() {
       {/* MAIN */}
       <div className="main" style={{ position: "relative" }}>
 
-        {/* ── HEADER — sama persis dengan Dashboard ── */}
+        {/* ══════════════════════════════════════
+            HEADER (TOPBAR) — DISAMAKAN DENGAN DASHBOARD
+            Satu baris: search bar | notif bell | logout
+        ══════════════════════════════════════ */}
         <div style={{
           display: "flex",
           alignItems: "center",
@@ -261,7 +232,8 @@ function Tugas() {
           position: "relative",
           zIndex: 10,
         }}>
-          {/* Search bar */}
+
+          {/* Search bar — mengisi sisa ruang */}
           <div style={{
             flex: 1,
             display: "flex",
@@ -362,7 +334,7 @@ function Tugas() {
                   notifTasks.map((task) => {
                     const sisa = getSisaHari(task.deadline);
                     return (
-                      <div key={task.id} style={{ padding: "10px 16px", borderBottom: "1px solid #f0f0f0" }}>
+                      <div key={task.id} style={{ padding: "10px 16px", borderBottom: "1px solid #f0f0f0", textAlign: "left" }}>
                         <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "3px" }}>
                           <span style={{ fontWeight: "600", fontSize: "12px", color: "#333" }}>{task.title}</span>
                           <span style={{ color: getNotifColor(sisa), fontSize: "11px", fontWeight: "600", whiteSpace: "nowrap", marginLeft: "6px" }}>
@@ -370,7 +342,7 @@ function Tugas() {
                           </span>
                         </div>
                         <div style={{ display: "flex", justifyContent: "space-between" }}>
-                          <span style={{ fontSize: "11px", color: "#888" }}>{task.type}</span>
+                          <span style={{ fontSize: "11px", color: "#888" }}>{task.type || "Umum"}</span>
                           <span style={{ fontSize: "11px", color: "#888" }}>📅 {formatDeadline(task.deadline)}</span>
                         </div>
                       </div>
@@ -388,7 +360,7 @@ function Tugas() {
               height: "38px",
               padding: "0 14px",
               borderRadius: "10px",
-              border: "1.5px solid #e53935",
+              border: "1px solid #e53935",
               background: "#fff",
               color: "#e53935",
               fontSize: "13px",
@@ -404,8 +376,7 @@ function Tugas() {
 
         {/* CONTENT */}
         <div className="content">
-          <h2>Daftar Tugas 📋</h2>
-
+          
           {Object.keys(grouped).length === 0 ? (
             <p className="empty-msg">Belum ada tugas.</p>
           ) : (
@@ -417,33 +388,24 @@ function Tugas() {
                 </div>
                 {taskList.map((task) => (
                   <div className="task-item" key={task.id}>
-                    <div className="task-left">
-                      <p>{task.title}</p>
-                      <span>Deadline: {formatDeadline(task.deadline)}</span>
-                      {task.description && (
-                        <span style={{ fontSize: "12px", color: "#999", marginTop: "2px", display: "block" }}>
-                          {task.description}
-                        </span>
-                      )}
+                    <div className="task-info">
+                      <h4>{task.title}</h4>
+                      <p className="task-deadline">Deadline: {formatDeadline(task.deadline)}</p>
+                      {task.description && <p className="task-desc">{task.description}</p>}
                     </div>
-                    <div className="task-right" style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "6px" }}>
-                      <button className={`status ${getStatusClass(task.status)}`}>
-                        {getStatusLabel(task.status)}
+                    <div className="task-actions">
+                      <button
+                        className="btn-edit"
+                        onClick={() => { setEditTask(task); setShowModal(true); }}
+                      >
+                        ✏️ Edit
                       </button>
-                      <div style={{ display: "flex", gap: "6px" }}>
-                        <button
-                          className="btn-edit"
-                          onClick={() => { setEditTask(task); setShowModal(true); }}
-                        >
-                          ✏️ Edit
-                        </button>
-                        <button
-                          className="btn-hapus"
-                          onClick={() => handleHapus(task.id)}
-                        >
-                          🗑️ Hapus
-                        </button>
-                      </div>
+                      <button
+                        className="btn-hapus"
+                        onClick={() => handleHapus(task.id)}
+                      >
+                        🗑️ Hapus
+                      </button>
                     </div>
                   </div>
                 ))}
@@ -451,10 +413,11 @@ function Tugas() {
             ))
           )}
 
+          {/* Spacer agar konten tidak ketutup tombol tambah di HP */}
           <div style={{ height: "80px" }} />
         </div>
 
-        {/* TOMBOL TAMBAH */}
+        {/* TOMBOL TAMBAH - floating di HP, normal di desktop */}
         <div className="bottom-bar">
           <button
             className="btn-tambah"
@@ -463,25 +426,9 @@ function Tugas() {
             + Tambah Tugas
           </button>
         </div>
+      </div>
 
-        {/* MODAL KONFIRMASI LOGOUT */}
-        {showLogoutConfirm && (
-          <div style={overlayStyle} onClick={handleCancelLogout}>
-            <div style={confirmBoxStyle} onClick={(e) => e.stopPropagation()}>
-              <div className="confirm-icon">⚠️</div>
-              <h3 className="confirm-title">Yakin Ingin Keluar?</h3>
-              <p className="confirm-message">Kamu akan keluar dari sesi TaskFlow ini.</p>
-              <div className="confirm-actions">
-                <button className="confirm-btn-no" onClick={handleCancelLogout}>Tidak</button>
-                <button className="confirm-btn-yes" onClick={handleConfirmLogout}>Ya, Keluar</button>
-              </div>
-            </div>
-          </div>
-        )}
-
-      </div>{/* end .main */}
-
-      {/* BOTTOM NAVIGATION */}
+      {/* BOTTOM NAVIGATION - hanya tampil di HP */}
       <div className="bottom-nav">
         <button className="bottom-nav-item" onClick={() => navigate("/dashboard")}>
           <span className="bottom-nav-icon">🏠</span>
@@ -523,16 +470,23 @@ function Tugas() {
             </div>
             <h3 className="popup-title">{popup.title}</h3>
             <p className="popup-message">{popup.message}</p>
+
             {popup.type === "confirm" ? (
               <div className="popup-actions">
-                <button className="popup-btn popup-btn-cancel" onClick={closePopup}>Batal</button>
-                <button className="popup-btn popup-btn-confirm"
-                  onClick={() => { popup.onConfirm && popup.onConfirm(); closePopup(); }}>
+                <button className="popup-btn popup-btn-cancel" onClick={closePopup}>
+                  Batal
+                </button>
+                <button
+                  className="popup-btn popup-btn-confirm"
+                  onClick={() => { popup.onConfirm && popup.onConfirm(); closePopup(); }}
+                >
                   Ya, Lanjutkan
                 </button>
               </div>
             ) : (
-              <button className="popup-btn popup-btn-ok" onClick={closePopup}>OK</button>
+              <button className="popup-btn popup-btn-ok" onClick={closePopup}>
+                OK
+              </button>
             )}
           </div>
         </div>
