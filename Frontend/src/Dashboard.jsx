@@ -20,7 +20,6 @@ const Dashboard = () => {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
 
-  // STATE kalender interaktif
   const [selectedCalendarDay, setSelectedCalendarDay] = useState(null);
 
   useEffect(() => {
@@ -44,13 +43,11 @@ const Dashboard = () => {
   }, []);
 
   const handleLogout = () => setShowLogoutConfirm(true);
-
   const handleConfirmLogout = () => {
     setShowLogoutConfirm(false);
     localStorage.removeItem("user");
     navigate("/");
   };
-
   const handleCancelLogout = () => setShowLogoutConfirm(false);
 
   const getStatusClass = (status) => {
@@ -130,12 +127,10 @@ const Dashboard = () => {
     return "#e53935";
   };
 
-  // HANDLER klik hari di kalender (toggle)
   const handleCalendarDayClick = (day) => {
     setSelectedCalendarDay((prev) => (prev === day ? null : day));
   };
 
-  // MODAL LOGIC
   const getModalTasks = () => {
     if (modalType === "total") return tasks;
     if (modalType === "selesai") return tasks.filter((t) => t.status === "Selesai");
@@ -224,7 +219,7 @@ const Dashboard = () => {
     try {
       await Promise.all(
         selectedTaskIds.map((id) =>
-          fetch(`http://localhost:3001/api/tasks/${id}`, { method: "DELETE" })
+          fetch(`https://rekaweb-rpl-production.up.railway.app/api/tasks/${id}`, { method: "DELETE" })
         )
       );
       setTasks((prev) => prev.filter((t) => !selectedTaskIds.includes(t.id)));
@@ -247,6 +242,33 @@ const Dashboard = () => {
   const modalTasks = getModalTasks();
   const groupedTasks = groupTasksByType(modalTasks);
 
+  /* ─── Style overlay & confirm box ─── */
+  const overlayStyle = {
+    position: "fixed",
+    inset: 0,
+    backgroundColor: "rgba(0,0,0,0.5)",
+    zIndex: 1000,
+    display: "flex",
+    alignItems: "flex-start",
+    justifyContent: "center",
+    overflowY: "auto",
+    paddingTop: "env(safe-area-inset-top, 16px)",
+    paddingBottom: "80px",
+    WebkitOverflowScrolling: "touch",
+  };
+
+  const confirmBoxStyle = {
+    background: "#fff",
+    borderRadius: "16px",
+    padding: "28px 20px",
+    width: "85%",
+    maxWidth: "360px",
+    marginTop: "30vh",
+    marginBottom: "16px",
+    textAlign: "center",
+    boxSizing: "border-box",
+  };
+
   return (
     <div className="dashboard">
 
@@ -257,62 +279,162 @@ const Dashboard = () => {
           <h2>TaskFlow</h2>
         </div>
         <ul className="menu">
-  <li className="active" onClick={() => navigate("/dashboard")}>
-    <span className="menu-icon">🏠</span> Dashboard
-  </li>
-  <li onClick={() => navigate("/tugas")}>
-    <span className="menu-icon">📋</span> Tugas
-  </li>
-  <li onClick={() => navigate("/kelompok")}>
-    <span className="menu-icon">👥</span> Kelompok
-  </li>
-  <li onClick={() => navigate("/riwayat")}>
-    <span className="menu-icon">⏱️</span> Riwayat
-  </li>
-  <li onClick={() => navigate("/profil")}>
-    <span className="menu-icon">👤</span> Profil
-  </li>
-</ul>
+          <li className="active" onClick={() => navigate("/dashboard")}>
+            <span className="menu-icon">🏠</span> Dashboard
+          </li>
+          <li onClick={() => navigate("/tugas")}>
+            <span className="menu-icon">📋</span> Tugas
+          </li>
+          <li onClick={() => navigate("/kelompok")}>
+            <span className="menu-icon">👥</span> Kelompok
+          </li>
+          <li onClick={() => navigate("/riwayat")}>
+            <span className="menu-icon">⏱️</span> Riwayat
+          </li>
+          <li onClick={() => navigate("/profil")}>
+            <span className="menu-icon">👤</span> Profil
+          </li>
+        </ul>
       </div>
 
       {/* MAIN */}
       <div className="main" style={{ position: "relative" }}>
 
-        {/* HEADER */}
-        <div className="header">
-          <div className="search-box">
-            <span className="search-icon">🔍</span>
-            <input type="text" placeholder="Cari tugas..." />
+        {/* ══════════════════════════════════════
+            HEADER — diperbaiki untuk mobile
+            Baris 1: search bar full width
+            Baris 2: notif + logout rata kanan
+        ══════════════════════════════════════ */}
+        <div className="header" style={{
+          display: "flex",
+          flexDirection: "column",
+          gap: "10px",
+          padding: "12px 16px",
+        }}>
+
+          {/* Baris 1: Search bar */}
+          <div className="search-box" style={{
+            display: "flex",
+            alignItems: "center",
+            background: "#fff",
+            border: "1px solid #e0e0e0",
+            borderRadius: "12px",
+            padding: "10px 14px",
+            gap: "8px",
+            width: "100%",
+            boxSizing: "border-box",
+          }}>
+            <span style={{ fontSize: "18px" }}>🔍</span>
+            <input
+              type="text"
+              placeholder="Cari tugas..."
+              style={{
+                border: "none",
+                outline: "none",
+                background: "transparent",
+                fontSize: "14px",
+                color: "#333",
+                width: "100%",
+              }}
+            />
           </div>
-          <div className="icons">
-            <div className="notif-wrapper" ref={notifRef}>
-              <div className="notif-bell" onClick={() => setShowNotif(!showNotif)}>
+
+          {/* Baris 2: Notif + Logout */}
+          <div style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "flex-end",
+            gap: "10px",
+          }}>
+
+            {/* Notifikasi Bell */}
+            <div
+              className="notif-wrapper"
+              ref={notifRef}
+              style={{ position: "relative" }}
+            >
+              <div
+                className="notif-bell"
+                onClick={() => setShowNotif(!showNotif)}
+                style={{
+                  width: "40px",
+                  height: "40px",
+                  borderRadius: "10px",
+                  background: "#fff",
+                  border: "1px solid #e0e0e0",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontSize: "20px",
+                  cursor: "pointer",
+                  position: "relative",
+                }}
+              >
                 🔔
                 {notifTasks.length > 0 && (
-                  <span className="notif-badge">{notifTasks.length}</span>
+                  <span className="notif-badge" style={{
+                    position: "absolute",
+                    top: "-4px",
+                    right: "-4px",
+                    background: "#e53935",
+                    color: "#fff",
+                    fontSize: "10px",
+                    fontWeight: "700",
+                    borderRadius: "50%",
+                    width: "18px",
+                    height: "18px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}>
+                    {notifTasks.length}
+                  </span>
                 )}
               </div>
+
               {showNotif && (
-                <div className="notif-dropdown">
-                  <div className="notif-header">
-                    <span>🔔 Notifikasi Deadline</span>
+                <div className="notif-dropdown" style={{
+                  position: "absolute",
+                  top: "48px",
+                  right: "0",
+                  width: "300px",
+                  maxWidth: "90vw",
+                  background: "#fff",
+                  borderRadius: "14px",
+                  boxShadow: "0 8px 24px rgba(0,0,0,0.15)",
+                  zIndex: 999,
+                  overflow: "hidden",
+                }}>
+                  <div className="notif-header" style={{
+                    padding: "12px 16px",
+                    fontWeight: "600",
+                    fontSize: "14px",
+                    borderBottom: "1px solid #f0f0f0",
+                    background: "#f8f8f8",
+                  }}>
+                    🔔 Notifikasi Deadline
                   </div>
                   {notifTasks.length === 0 ? (
-                    <div className="notif-empty">Tidak ada deadline mendekat 🎉</div>
+                    <div className="notif-empty" style={{ padding: "16px", fontSize: "13px", color: "#888", textAlign: "center" }}>
+                      Tidak ada deadline mendekat 🎉
+                    </div>
                   ) : (
                     notifTasks.map((task) => {
                       const sisa = getSisaHari(task.deadline);
                       return (
-                        <div className="notif-item" key={task.id}>
-                          <div className="notif-item-top">
-                            <span className="notif-title">{task.title}</span>
-                            <span className="notif-sisa" style={{ color: getNotifColor(sisa) }}>
+                        <div className="notif-item" key={task.id} style={{
+                          padding: "12px 16px",
+                          borderBottom: "1px solid #f0f0f0",
+                        }}>
+                          <div className="notif-item-top" style={{ display: "flex", justifyContent: "space-between", marginBottom: "4px" }}>
+                            <span className="notif-title" style={{ fontWeight: "600", fontSize: "13px", color: "#333" }}>{task.title}</span>
+                            <span className="notif-sisa" style={{ color: getNotifColor(sisa), fontSize: "12px", fontWeight: "600", whiteSpace: "nowrap", marginLeft: "8px" }}>
                               {getNotifLabel(sisa)}
                             </span>
                           </div>
-                          <div className="notif-item-bottom">
-                            <span className="notif-matkul">{task.type}</span>
-                            <span className="notif-deadline">📅 {formatDeadline(task.deadline)}</span>
+                          <div className="notif-item-bottom" style={{ display: "flex", justifyContent: "space-between" }}>
+                            <span className="notif-matkul" style={{ fontSize: "12px", color: "#888" }}>{task.type}</span>
+                            <span className="notif-deadline" style={{ fontSize: "12px", color: "#888" }}>📅 {formatDeadline(task.deadline)}</span>
                           </div>
                         </div>
                       );
@@ -321,7 +443,25 @@ const Dashboard = () => {
                 </div>
               )}
             </div>
-            <button className="btn-logout" onClick={handleLogout}>Logout</button>
+
+            {/* Tombol Logout */}
+            <button
+              onClick={handleLogout}
+              style={{
+                height: "40px",
+                padding: "0 18px",
+                borderRadius: "10px",
+                border: "1.5px solid #e53935",
+                background: "#fff",
+                color: "#e53935",
+                fontSize: "14px",
+                fontWeight: "600",
+                cursor: "pointer",
+                whiteSpace: "nowrap",
+              }}
+            >
+              Logout
+            </button>
           </div>
         </div>
 
@@ -425,7 +565,6 @@ const Dashboard = () => {
                   })}
                 </div>
 
-                {/* PANEL DETAIL HARI YANG DIPILIH */}
                 {selectedCalendarDay && (
                   <div className="calendar-day-detail">
                     <div className="calendar-day-detail-header">
@@ -492,13 +631,6 @@ const Dashboard = () => {
                   <button
                     className="modal-btn-delete"
                     onClick={handleDeleteSelected}
-                    title={
-                      !isEditMode
-                        ? "Klik Edit dulu untuk memilih tugas"
-                        : selectedTaskIds.length === 0
-                        ? "Pilih tugas dulu"
-                        : `Hapus ${selectedTaskIds.length} tugas`
-                    }
                     style={{
                       opacity: isEditMode && selectedTaskIds.length > 0 ? 1 : 0.35,
                       cursor: isEditMode && selectedTaskIds.length > 0 ? "pointer" : "not-allowed",
@@ -590,8 +722,8 @@ const Dashboard = () => {
 
         {/* MODAL KONFIRMASI HAPUS */}
         {showDeleteConfirm && (
-          <div className="confirm-overlay" onClick={handleCancelDelete}>
-            <div className="confirm-box" onClick={(e) => e.stopPropagation()}>
+          <div style={overlayStyle} onClick={handleCancelDelete}>
+            <div style={confirmBoxStyle} onClick={(e) => e.stopPropagation()}>
               <div className="confirm-icon">🗑️</div>
               <h3 className="confirm-title">Hapus Tugas</h3>
               <p className="confirm-message">
@@ -610,8 +742,8 @@ const Dashboard = () => {
 
         {/* MODAL KONFIRMASI LOGOUT */}
         {showLogoutConfirm && (
-          <div className="confirm-overlay" onClick={handleCancelLogout}>
-            <div className="confirm-box" onClick={(e) => e.stopPropagation()}>
+          <div style={overlayStyle} onClick={handleCancelLogout}>
+            <div style={confirmBoxStyle} onClick={(e) => e.stopPropagation()}>
               <div className="confirm-icon">⚠️</div>
               <h3 className="confirm-title">Yakin Ingin Keluar?</h3>
               <p className="confirm-message">
@@ -627,29 +759,29 @@ const Dashboard = () => {
 
       </div>{/* end .main */}
 
-      {/* ✅ BOTTOM NAVIGATION - hanya tampil di HP */}
+      {/* BOTTOM NAVIGATION */}
       <div className="bottom-nav">
-  <button className="bottom-nav-item active" onClick={() => navigate("/dashboard")}>
-    <span className="bottom-nav-icon">🏠</span>
-    <span className="bottom-nav-label">Dashboard</span>
-  </button>
-  <button className="bottom-nav-item" onClick={() => navigate("/tugas")}>
-    <span className="bottom-nav-icon">📋</span>
-    <span className="bottom-nav-label">Tugas</span>
-  </button>
-  <button className="bottom-nav-item" onClick={() => navigate("/kelompok")}>
-    <span className="bottom-nav-icon">👥</span>
-    <span className="bottom-nav-label">Kelompok</span>
-  </button>
-  <button className="bottom-nav-item" onClick={() => navigate("/riwayat")}>
-    <span className="bottom-nav-icon">⏱️</span>
-    <span className="bottom-nav-label">Riwayat</span>
-  </button>
-  <button className="bottom-nav-item" onClick={() => navigate("/profil")}>
-    <span className="bottom-nav-icon">👤</span>
-    <span className="bottom-nav-label">Profil</span>
-  </button>
-</div>
+        <button className="bottom-nav-item active" onClick={() => navigate("/dashboard")}>
+          <span className="bottom-nav-icon">🏠</span>
+          <span className="bottom-nav-label">Dashboard</span>
+        </button>
+        <button className="bottom-nav-item" onClick={() => navigate("/tugas")}>
+          <span className="bottom-nav-icon">📋</span>
+          <span className="bottom-nav-label">Tugas</span>
+        </button>
+        <button className="bottom-nav-item" onClick={() => navigate("/kelompok")}>
+          <span className="bottom-nav-icon">👥</span>
+          <span className="bottom-nav-label">Kelompok</span>
+        </button>
+        <button className="bottom-nav-item" onClick={() => navigate("/riwayat")}>
+          <span className="bottom-nav-icon">⏱️</span>
+          <span className="bottom-nav-label">Riwayat</span>
+        </button>
+        <button className="bottom-nav-item" onClick={() => navigate("/profil")}>
+          <span className="bottom-nav-icon">👤</span>
+          <span className="bottom-nav-label">Profil</span>
+        </button>
+      </div>
 
     </div>
   );
