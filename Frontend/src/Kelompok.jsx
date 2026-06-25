@@ -152,6 +152,46 @@ function Kelompok() {
     }
   };
 
+  /* ─── Style helper untuk overlay & modal-box ─── */
+  const overlayStyle = {
+    position: "fixed",
+    inset: 0,
+    backgroundColor: "rgba(0,0,0,0.5)",
+    zIndex: 1000,
+    display: "flex",
+    alignItems: "flex-start",       /* mulai dari atas agar tidak terpotong */
+    justifyContent: "center",
+    overflowY: "auto",              /* overlay sendiri bisa di-scroll */
+    paddingTop: "env(safe-area-inset-top, 16px)",
+    paddingBottom: "80px",          /* beri ruang di bawah untuk bottom nav */
+    WebkitOverflowScrolling: "touch",
+  };
+
+  const modalBoxStyle = {
+    background: "#fff",
+    borderRadius: "16px",
+    padding: "20px",
+    width: "90%",
+    maxWidth: "480px",
+    marginTop: "16px",
+    marginBottom: "16px",
+    boxSizing: "border-box",
+    /* TIDAK pakai maxHeight di sini — biarkan konten menentukan tinggi,
+       overlay-lah yang di-scroll. Ini cara paling andal di Android. */
+  };
+
+  const confirmBoxStyle = {
+    background: "#fff",
+    borderRadius: "16px",
+    padding: "28px 20px",
+    width: "85%",
+    maxWidth: "360px",
+    marginTop: "30vh",
+    marginBottom: "16px",
+    textAlign: "center",
+    boxSizing: "border-box",
+  };
+
   return (
     <div className="kelompok-page">
 
@@ -170,12 +210,12 @@ function Kelompok() {
           <h2>TaskFlow</h2>
         </div>
         <ul className="menu">
-  <li onClick={() => navigate("/dashboard")}><span className="menu-icon">🏠</span> Dashboard</li>
-  <li onClick={() => navigate("/tugas")}><span className="menu-icon">📋</span> Tugas</li>
-  <li className="active"><span className="menu-icon">👥</span> Kelompok</li>
-  <li onClick={() => navigate("/riwayat")}><span className="menu-icon">⏱️</span> Riwayat</li>
-  <li onClick={() => navigate("/profil")}><span className="menu-icon">👤</span> Profil</li>
-</ul>
+          <li onClick={() => navigate("/dashboard")}><span className="menu-icon">🏠</span> Dashboard</li>
+          <li onClick={() => navigate("/tugas")}><span className="menu-icon">📋</span> Tugas</li>
+          <li className="active"><span className="menu-icon">👥</span> Kelompok</li>
+          <li onClick={() => navigate("/riwayat")}><span className="menu-icon">⏱️</span> Riwayat</li>
+          <li onClick={() => navigate("/profil")}><span className="menu-icon">👤</span> Profil</li>
+        </ul>
       </div>
 
       {/* MAIN */}
@@ -196,7 +236,6 @@ function Kelompok() {
           {/* SEARCH + TOMBOL TAMBAH */}
           <div className="search-box">
             <input type="text" placeholder="Cari tugas kelompok..." />
-            {/* Tombol tambah hanya tampil di desktop */}
             <button className="btn-tambah-desktop" onClick={() => setShowModal(true)}>
               + Tambah Kelompok
             </button>
@@ -216,12 +255,9 @@ function Kelompok() {
             ) : (
               groups.map((g, i) => (
                 <div className="group-item" key={i}>
-
-                  {/* INFO KELOMPOK */}
                   <div className="group-name">
                     <h4>{g.nama}</h4>
                     <p>{g.deskripsi}</p>
-                    {/* Meta info tampil di HP sebagai badge */}
                     <div className="group-meta-mobile">
                       <span className="meta-badge">📚 {g.matkul}</span>
                       <span className="meta-badge">👥 {g.anggota}</span>
@@ -230,12 +266,8 @@ function Kelompok() {
                       </span>
                     </div>
                   </div>
-
-                  {/* Kolom desktop */}
                   <span className="desktop-only">{g.matkul}</span>
                   <span className="desktop-only">{g.anggota}</span>
-
-                  {/* TOMBOL AKSI */}
                   <div className="aksi-buttons">
                     <button className="btn-edit" onClick={() => handleOpenEdit(g)}>✏️ Edit</button>
                     <button className="btn-hapus" onClick={() => handleHapus(g.id)}>🗑️ Hapus</button>
@@ -245,7 +277,6 @@ function Kelompok() {
             )}
           </div>
 
-          {/* Spacer agar konten tidak ketutup bottom nav */}
           <div style={{ height: "80px" }} />
         </div>
 
@@ -257,35 +288,39 @@ function Kelompok() {
         </div>
       </div>
 
-      {/* BOTTOM NAVIGATION - hanya tampil di HP */}
+      {/* BOTTOM NAVIGATION */}
       <div className="bottom-nav">
-  <button className="bottom-nav-item" onClick={() => navigate("/dashboard")}>
-    <span className="bottom-nav-icon">🏠</span>
-    <span className="bottom-nav-label">Dashboard</span>
-  </button>
-  <button className="bottom-nav-item" onClick={() => navigate("/tugas")}>
-    <span className="bottom-nav-icon">📋</span>
-    <span className="bottom-nav-label">Tugas</span>
-  </button>
-  <button className="bottom-nav-item active">
-    <span className="bottom-nav-icon">👥</span>
-    <span className="bottom-nav-label">Kelompok</span>
-  </button>
-  <button className="bottom-nav-item" onClick={() => navigate("/riwayat")}>
-    <span className="bottom-nav-icon">⏱️</span>
-    <span className="bottom-nav-label">Riwayat</span>
-  </button>
-  <button className="bottom-nav-item" onClick={() => navigate("/profil")}>
-    <span className="bottom-nav-icon">👤</span>
-    <span className="bottom-nav-label">Profil</span>
-  </button>
-</div>
+        <button className="bottom-nav-item" onClick={() => navigate("/dashboard")}>
+          <span className="bottom-nav-icon">🏠</span>
+          <span className="bottom-nav-label">Dashboard</span>
+        </button>
+        <button className="bottom-nav-item" onClick={() => navigate("/tugas")}>
+          <span className="bottom-nav-icon">📋</span>
+          <span className="bottom-nav-label">Tugas</span>
+        </button>
+        <button className="bottom-nav-item active">
+          <span className="bottom-nav-icon">👥</span>
+          <span className="bottom-nav-label">Kelompok</span>
+        </button>
+        <button className="bottom-nav-item" onClick={() => navigate("/riwayat")}>
+          <span className="bottom-nav-icon">⏱️</span>
+          <span className="bottom-nav-label">Riwayat</span>
+        </button>
+        <button className="bottom-nav-item" onClick={() => navigate("/profil")}>
+          <span className="bottom-nav-icon">👤</span>
+          <span className="bottom-nav-label">Profil</span>
+        </button>
+      </div>
 
 
-      {/* MODAL TAMBAH */}
+      {/* ══════════════════════════════════════
+          MODAL TAMBAH
+          Perbaikan: overlay bisa di-scroll,
+          modal-box tidak fixed height
+      ══════════════════════════════════════ */}
       {showModal && (
-        <div className="modal-overlay" onClick={() => setShowModal(false)}>
-          <div className="modal-box" onClick={e => e.stopPropagation()}>
+        <div style={overlayStyle} onClick={() => setShowModal(false)}>
+          <div style={modalBoxStyle} onClick={e => e.stopPropagation()}>
             <div className="modal-header">
               <h3>Tambah Kelompok Baru</h3>
               <button className="modal-close" onClick={() => setShowModal(false)}>✕</button>
@@ -327,10 +362,12 @@ function Kelompok() {
         </div>
       )}
 
-      {/* MODAL EDIT */}
+      {/* ══════════════════════════════════════
+          MODAL EDIT
+      ══════════════════════════════════════ */}
       {showEditModal && (
-        <div className="modal-overlay" onClick={() => setShowEditModal(false)}>
-          <div className="modal-box" onClick={e => e.stopPropagation()}>
+        <div style={overlayStyle} onClick={() => setShowEditModal(false)}>
+          <div style={modalBoxStyle} onClick={e => e.stopPropagation()}>
             <div className="modal-header">
               <h3>Edit Kelompok</h3>
               <button className="modal-close" onClick={() => setShowEditModal(false)}>✕</button>
@@ -373,10 +410,12 @@ function Kelompok() {
         </div>
       )}
 
-      {/* MODAL KONFIRMASI */}
+      {/* ══════════════════════════════════════
+          MODAL KONFIRMASI (logout & hapus)
+      ══════════════════════════════════════ */}
       {confirmModal.show && (
-        <div className="modal-overlay" onClick={handleConfirmCancel}>
-          <div className="confirm-box" onClick={e => e.stopPropagation()}>
+        <div style={overlayStyle} onClick={handleConfirmCancel}>
+          <div style={confirmBoxStyle} onClick={e => e.stopPropagation()}>
             <div className="confirm-icon">
               {confirmModal.type === "logout" ? "⚠️" : "🗑️"}
             </div>
