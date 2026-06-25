@@ -53,6 +53,7 @@ function Tugas() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  // ── Notif logic (sama persis dengan Dashboard) ──
   const getSisaHari = (deadline) => {
     if (!deadline) return null;
     const diff = new Date(deadline) - new Date();
@@ -161,17 +162,18 @@ function Tugas() {
     });
   };
 
+  const getStatusClass = (status) => {
+    if (status === "Belum") return "blue";
+    if (status === "Proses") return "orange";
+    if (status === "Selesai") return "green";
+    return "blue";
+  };
+
   const getStatusLabel = (status) => {
     if (status === "Belum") return "Belum dikerjakan";
     if (status === "Proses") return "Sementara dikerjakan";
     if (status === "Selesai") return "Selesai";
     return status;
-  };
-
-  const getStatusColor = (status) => {
-    if (status === "Selesai") return "#4caf50";
-    if (status === "Proses") return "#f7931e";
-    return "#2d7dd2";
   };
 
   const filteredTasks = tasks.filter(
@@ -189,6 +191,7 @@ function Tugas() {
 
   const popupIcon = { success: "✅", error: "❌", confirm: "⚠️", info: "ℹ️" };
 
+  // ── Style overlay & confirm box (sama dengan Dashboard) ──
   const overlayStyle = {
     position: "fixed",
     inset: 0,
@@ -246,7 +249,7 @@ function Tugas() {
       {/* MAIN */}
       <div className="main" style={{ position: "relative" }}>
 
-        {/* HEADER */}
+        {/* ── HEADER — sama persis dengan Dashboard ── */}
         <div style={{
           display: "flex",
           alignItems: "center",
@@ -328,6 +331,7 @@ function Tugas() {
               )}
             </button>
 
+            {/* Dropdown notif */}
             {showNotif && (
               <div style={{
                 position: "absolute",
@@ -411,91 +415,35 @@ function Tugas() {
                   <span className="group-icon">☰</span>
                   <h3>{mataKuliah}</h3>
                 </div>
-
                 {taskList.map((task) => (
-                  <div
-                    key={task.id}
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "space-between",
-                      padding: "12px 14px",
-                      borderBottom: "1px solid #f0f0f0",
-                      gap: "10px",
-                    }}
-                  >
-                    {/* KIRI — info tugas + status badge */}
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <p style={{
-                        margin: 0,
-                        fontWeight: "600",
-                        fontSize: "14px",
-                        color: "#222",
-                        whiteSpace: "nowrap",
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
-                      }}>
-                        {task.title}
-                      </p>
-                      <p style={{ margin: "3px 0 0", fontSize: "12px", color: "#888" }}>
-                        📅 Deadline: {formatDeadline(task.deadline)}
-                      </p>
+                  <div className="task-item" key={task.id}>
+                    <div className="task-left">
+                      <p>{task.title}</p>
+                      <span>Deadline: {formatDeadline(task.deadline)}</span>
                       {task.description && (
-                        <p style={{ margin: "2px 0 0", fontSize: "11px", color: "#aaa" }}>
+                        <span style={{ fontSize: "12px", color: "#999", marginTop: "2px", display: "block" }}>
                           {task.description}
-                        </p>
+                        </span>
                       )}
-                      {/* Status badge */}
-                      <span style={{
-                        display: "inline-block",
-                        marginTop: "6px",
-                        padding: "2px 10px",
-                        borderRadius: "20px",
-                        fontSize: "11px",
-                        fontWeight: "600",
-                        color: "#fff",
-                        background: getStatusColor(task.status),
-                      }}>
-                        {getStatusLabel(task.status)}
-                      </span>
                     </div>
-
-                    {/* KANAN — tombol icon saja */}
-                    <div style={{ display: "flex", gap: "6px", flexShrink: 0 }}>
-                      <button
-                        onClick={() => { setEditTask(task); setShowModal(true); }}
-                        style={{
-                          width: "34px",
-                          height: "34px",
-                          borderRadius: "8px",
-                          border: "1px solid #2d7dd2",
-                          background: "#fff",
-                          fontSize: "15px",
-                          cursor: "pointer",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                        }}
-                      >
-                        ✏️
+                    <div className="task-right" style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "6px" }}>
+                      <button className={`status ${getStatusClass(task.status)}`}>
+                        {getStatusLabel(task.status)}
                       </button>
-                      <button
-                        onClick={() => handleHapus(task.id)}
-                        style={{
-                          width: "34px",
-                          height: "34px",
-                          borderRadius: "8px",
-                          border: "1px solid #e53935",
-                          background: "#fff",
-                          fontSize: "15px",
-                          cursor: "pointer",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                        }}
-                      >
-                        🗑️
-                      </button>
+                      <div style={{ display: "flex", gap: "6px" }}>
+                        <button
+                          className="btn-edit"
+                          onClick={() => { setEditTask(task); setShowModal(true); }}
+                        >
+                          ✏️ Edit
+                        </button>
+                        <button
+                          className="btn-hapus"
+                          onClick={() => handleHapus(task.id)}
+                        >
+                          🗑️ Hapus
+                        </button>
+                      </div>
                     </div>
                   </div>
                 ))}
