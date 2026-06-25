@@ -113,6 +113,33 @@ function Riwayat() {
     return matchFilter && matchSearch;
   });
 
+  /* ─── Style overlay & confirm box ─── */
+  const overlayStyle = {
+    position: "fixed",
+    inset: 0,
+    backgroundColor: "rgba(0,0,0,0.5)",
+    zIndex: 1000,
+    display: "flex",
+    alignItems: "flex-start",
+    justifyContent: "center",
+    overflowY: "auto",
+    paddingTop: "env(safe-area-inset-top, 16px)",
+    paddingBottom: "80px",
+    WebkitOverflowScrolling: "touch",
+  };
+
+  const confirmBoxStyle = {
+    background: "#fff",
+    borderRadius: "16px",
+    padding: "28px 20px",
+    width: "85%",
+    maxWidth: "360px",
+    marginTop: "30vh",
+    marginBottom: "16px",
+    textAlign: "center",
+    boxSizing: "border-box",
+  };
+
   return (
     <div className="dashboard">
 
@@ -131,12 +158,12 @@ function Riwayat() {
           <h2>TaskFlow</h2>
         </div>
         <ul className="menu">
-  <li onClick={() => navigate("/dashboard")}><span className="menu-icon">🏠</span> Dashboard</li>
-  <li onClick={() => navigate("/tugas")}><span className="menu-icon">📋</span> Tugas</li>
-  <li onClick={() => navigate("/kelompok")}><span className="menu-icon">👥</span> Kelompok</li>
-  <li className="active"><span className="menu-icon">⏱️</span> Riwayat</li>
-  <li onClick={() => navigate("/profil")}><span className="menu-icon">👤</span> Profil</li>
-</ul>
+          <li onClick={() => navigate("/dashboard")}><span className="menu-icon">🏠</span> Dashboard</li>
+          <li onClick={() => navigate("/tugas")}><span className="menu-icon">📋</span> Tugas</li>
+          <li onClick={() => navigate("/kelompok")}><span className="menu-icon">👥</span> Kelompok</li>
+          <li className="active"><span className="menu-icon">⏱️</span> Riwayat</li>
+          <li onClick={() => navigate("/profil")}><span className="menu-icon">👤</span> Profil</li>
+        </ul>
       </div>
 
       {/* MAIN */}
@@ -248,40 +275,41 @@ function Riwayat() {
             </div>
           )}
 
-          {/* Spacer agar konten tidak ketutup bottom nav */}
           <div style={{ height: "80px" }} />
         </div>
       </div>
 
-      {/* BOTTOM NAVIGATION - hanya tampil di HP */}
+      {/* BOTTOM NAVIGATION */}
       <div className="bottom-nav">
-  <button className="bottom-nav-item" onClick={() => navigate("/dashboard")}>
-    <span className="bottom-nav-icon">🏠</span>
-    <span className="bottom-nav-label">Dashboard</span>
-  </button>
-  <button className="bottom-nav-item" onClick={() => navigate("/tugas")}>
-    <span className="bottom-nav-icon">📋</span>
-    <span className="bottom-nav-label">Tugas</span>
-  </button>
-  <button className="bottom-nav-item" onClick={() => navigate("/kelompok")}>
-    <span className="bottom-nav-icon">👥</span>
-    <span className="bottom-nav-label">Kelompok</span>
-  </button>
-  <button className="bottom-nav-item active">
-    <span className="bottom-nav-icon">⏱️</span>
-    <span className="bottom-nav-label">Riwayat</span>
-  </button>
-  <button className="bottom-nav-item" onClick={() => navigate("/profil")}>
-    <span className="bottom-nav-icon">👤</span>
-    <span className="bottom-nav-label">Profil</span>
-  </button>
-</div>
+        <button className="bottom-nav-item" onClick={() => navigate("/dashboard")}>
+          <span className="bottom-nav-icon">🏠</span>
+          <span className="bottom-nav-label">Dashboard</span>
+        </button>
+        <button className="bottom-nav-item" onClick={() => navigate("/tugas")}>
+          <span className="bottom-nav-icon">📋</span>
+          <span className="bottom-nav-label">Tugas</span>
+        </button>
+        <button className="bottom-nav-item" onClick={() => navigate("/kelompok")}>
+          <span className="bottom-nav-icon">👥</span>
+          <span className="bottom-nav-label">Kelompok</span>
+        </button>
+        <button className="bottom-nav-item active">
+          <span className="bottom-nav-icon">⏱️</span>
+          <span className="bottom-nav-label">Riwayat</span>
+        </button>
+        <button className="bottom-nav-item" onClick={() => navigate("/profil")}>
+          <span className="bottom-nav-icon">👤</span>
+          <span className="bottom-nav-label">Profil</span>
+        </button>
+      </div>
 
-
-      {/* MODAL KONFIRMASI */}
+      {/* ══════════════════════════════════════
+          MODAL KONFIRMASI (logout, hapus tugas, hapus kelompok)
+          Perbaikan: overlay scrollable, confirm-box tidak tenggelam
+      ══════════════════════════════════════ */}
       {confirmModal.show && (
-        <div className="modal-overlay" onClick={handleConfirmCancel}>
-          <div className="confirm-box" onClick={e => e.stopPropagation()}>
+        <div style={overlayStyle} onClick={handleConfirmCancel}>
+          <div style={confirmBoxStyle} onClick={e => e.stopPropagation()}>
             <div className="confirm-icon">
               {confirmModal.type === "logout" ? "⚠️" : "🗑️"}
             </div>
