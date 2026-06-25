@@ -302,8 +302,10 @@ const Dashboard = () => {
 
         {/* ══════════════════════════════════════
             HEADER — satu baris: search | notif | logout
+            Pakai div biasa (bukan className="header")
+            agar tidak di-override CSS
         ══════════════════════════════════════ */}
-        <div className="header" style={{
+        <div style={{
           display: "flex",
           alignItems: "center",
           gap: "8px",
@@ -311,6 +313,8 @@ const Dashboard = () => {
           background: "#fff",
           boxSizing: "border-box",
           width: "100%",
+          position: "relative",
+          zIndex: 10,
         }}>
 
           {/* Search bar — mengisi sisa ruang */}
